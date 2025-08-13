@@ -46,8 +46,20 @@ def get_content_based_recommendations(book_title, books_df, similarity_matrix, t
         recommendations: List of recommended book indices and scores
     """
     try:
-        # Find the book index
-        book_idx = books_df[books_df['title'].str.lower() == book_title.lower()].index[0]
+        # Find the book index (handle partial matches and duplicates)
+        import re
+        escaped_title = re.escape(book_title.lower())
+        matches = books_df[books_df['title'].str.lower().str.contains(escaped_title, regex=True, na=False)]
+        
+        if len(matches) == 0:
+            raise IndexError("Book not found")
+        
+        # If multiple matches, prefer the one with the lowest book_id (usually the first one)
+        if len(matches) > 1:
+            # Sort by book_id and take the first one
+            matches = matches.sort_values('book_id')
+        
+        book_idx = matches.index[0]
         
         # Get similarity scores for this book
         book_similarities = similarity_matrix[book_idx]
@@ -61,10 +73,10 @@ def get_content_based_recommendations(book_title, books_df, similarity_matrix, t
             recommendations.append({
                 'book_id': books_df.iloc[idx]['book_id'],
                 'title': books_df.iloc[idx]['title'],
-                'author': books_df.iloc[idx]['author'],
-                'genre': books_df.iloc[idx]['genre'],
+                'authors': books_df.iloc[idx]['authors'],
+                'genre': books_df.iloc[idx].get('publisher', 'Unknown'),
                 'similarity_score': book_similarities[idx],
-                'rating': books_df.iloc[idx].get('rating', 0)
+                'rating': books_df.iloc[idx].get('average_rating', 0)
             })
         
         return recommendations
@@ -101,46 +113,58 @@ def get_book_features(books_df, book_title):
         features: Dictionary with book features
     """
     try:
-        book = books_df[books_df['title'].str.lower() == book_title.lower()].iloc[0]
+        import re
+        escaped_title = re.escape(book_title.lower())
+        matches = books_df[books_df['title'].str.lower().str.contains(escaped_title, regex=True, na=False)]
+        
+        if len(matches) == 0:
+            raise IndexError("Book not found")
+        
+        # If multiple matches, prefer the one with the lowest book_id (usually the first one)
+        if len(matches) > 1:
+            # Sort by book_id and take the first one
+            matches = matches.sort_values('book_id')
+        
+        book = matches.iloc[0]
         return {
             'title': book['title'],
-            'author': book['author'],
-            'genre': book['genre'],
+            'authors': book['authors'],
+            'genre': book.get('publisher', 'Unknown'),
             'description': book.get('description', ''),
-            'rating': book.get('rating', 0),
-            'pages': book.get('pages', 0)
+            'rating': book.get('average_rating', 0),
+            'pages': book.get('num_pages', 0)
         }
     except (IndexError, KeyError):
         return None
 
 def analyze_genre_similarity(books_df, similarity_matrix):
     """
-    Analyze similarity patterns within and across genres.
+    Analyze similarity patterns within and across publishers.
     
     Args:
         books_df: DataFrame with book information
         similarity_matrix: Pre-computed similarity matrix
     
     Returns:
-        genre_analysis: Dictionary with genre similarity statistics
+        genre_analysis: Dictionary with publisher similarity statistics
     """
-    genres = books_df['genre'].unique()
+    publishers = books_df['publisher'].unique()
     genre_analysis = {}
     
-    for genre in genres:
-        genre_books = books_df[books_df['genre'] == genre]
-        genre_indices = genre_books.index
+    for publisher in publishers:
+        publisher_books = books_df[books_df['publisher'] == publisher]
+        publisher_indices = publisher_books.index
         
-        if len(genre_indices) > 1:
-            # Calculate average similarity within genre
+        if len(publisher_indices) > 1:
+            # Calculate average similarity within publisher
             within_similarities = []
-            for i in genre_indices:
-                for j in genre_indices:
+            for i in publisher_indices:
+                for j in publisher_indices:
                     if i != j:
                         within_similarities.append(similarity_matrix[i, j])
             
-            genre_analysis[genre] = {
-                'count': len(genre_indices),
+            genre_analysis[publisher] = {
+                'count': len(publisher_indices),
                 'avg_within_similarity': np.mean(within_similarities),
                 'std_within_similarity': np.std(within_similarities)
             }

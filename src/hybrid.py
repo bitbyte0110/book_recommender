@@ -21,27 +21,51 @@ def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix
         hybrid_recommendations: List of recommended books with hybrid scores
     """
     try:
-        # Find the book index
-        book_idx = books_df[books_df['title'].str.lower() == book_title.lower()].index[0]
+        # Find the book index (handle partial matches and duplicates)
+        import re
+        escaped_title = re.escape(book_title.lower())
+        matches = books_df[books_df['title'].str.lower().str.contains(escaped_title, regex=True, na=False)]
+        
+        if len(matches) == 0:
+            raise IndexError("Book not found")
+        
+        # If multiple matches, prefer the one with the lowest book_id (usually the first one)
+        if len(matches) > 1:
+            # Sort by book_id and take the first one
+            matches = matches.sort_values('book_id')
+        
+        book_idx = matches.index[0]
         
         # Get content-based scores
         content_scores = content_sim_matrix[book_idx]
         
-        # Get collaborative scores
-        collab_scores = collab_sim_matrix[book_idx]
+        # Initialize variables
+        collab_data_available = False
+        collab_scores = np.zeros_like(content_scores)
         
-        # Check if collaborative filtering has enough data
-        collab_data_available = np.sum(collab_scores > 0) > 1
-        
-        if collab_data_available:
-            # Normalize scores to 0-1 range
-            content_scores_norm = (content_scores - content_scores.min()) / (content_scores.max() - content_scores.min())
-            collab_scores_norm = (collab_scores - collab_scores.min()) / (collab_scores.max() - collab_scores.min())
+        # Check if collaborative filtering matrix has the same shape
+        if collab_sim_matrix.shape[0] == content_sim_matrix.shape[0]:
+            # Get collaborative scores
+            collab_scores = collab_sim_matrix[book_idx]
             
-            # Calculate hybrid scores
-            hybrid_scores = alpha * content_scores_norm + (1 - alpha) * collab_scores_norm
+            # Check if collaborative filtering has enough data
+            collab_data_available = np.sum(collab_scores > 0) > 1
+            
+            if collab_data_available:
+                # Normalize scores to 0-1 range
+                content_scores_norm = (content_scores - content_scores.min()) / (content_scores.max() - content_scores.min())
+                collab_scores_norm = (collab_scores - collab_scores.min()) / (collab_scores.max() - collab_scores.min())
+                
+                # Calculate hybrid scores
+                hybrid_scores = alpha * content_scores_norm + (1 - alpha) * collab_scores_norm
+            else:
+                # Fall back to content-based only
+                if fallback_to_content:
+                    hybrid_scores = content_scores
+                else:
+                    return []
         else:
-            # Fall back to content-based only
+            # Collaborative matrix has different shape, use content-based only
             if fallback_to_content:
                 hybrid_scores = content_scores
             else:
@@ -56,13 +80,13 @@ def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix
             recommendations.append({
                 'book_id': books_df.iloc[idx]['book_id'],
                 'title': books_df.iloc[idx]['title'],
-                'author': books_df.iloc[idx]['author'],
-                'genre': books_df.iloc[idx]['genre'],
+                'authors': books_df.iloc[idx]['authors'],
+                'genre': books_df.iloc[idx].get('publisher', 'Unknown'),
                 'hybrid_score': hybrid_scores[idx],
                 'content_score': content_scores[idx],
                 'collab_score': collab_scores[idx] if collab_data_available else 0,
-                'rating': books_df.iloc[idx].get('rating', 0),
-                'method': 'hybrid' if collab_data_available else 'content_only'
+                'rating': books_df.iloc[idx].get('average_rating', 0),
+                'method': 'hybrid' if collab_data_available and collab_sim_matrix.shape[0] == content_sim_matrix.shape[0] else 'content_only'
             })
         
         return recommendations
@@ -151,10 +175,10 @@ def optimize_alpha(book_title, books_df, content_sim_matrix, collab_sim_matrix,
                                          collab_sim_matrix, alpha, top_n)
         
         if recommendations:
-            # Calculate diversity based on genre variety
-            genres = [rec['genre'] for rec in recommendations]
-            unique_genres = len(set(genres))
-            diversity_score = unique_genres / len(genres) if len(genres) > 0 else 0
+            # Calculate diversity based on publisher variety
+            publishers = [rec['genre'] for rec in recommendations]  # genre field contains publisher
+            unique_publishers = len(set(publishers))
+            diversity_score = unique_publishers / len(publishers) if len(publishers) > 0 else 0
             diversity_scores.append(diversity_score)
         else:
             diversity_scores.append(0)
@@ -201,7 +225,7 @@ def get_personalized_recommendations(user_preferences, books_df, content_sim_mat
         if book_id not in book_scores:
             book_scores[book_id] = {
                 'title': rec['title'],
-                'author': rec['author'],
+                'authors': rec['authors'],
                 'genre': rec['genre'],
                 'total_score': 0,
                 'count': 0,
@@ -218,7 +242,7 @@ def get_personalized_recommendations(user_preferences, books_df, content_sim_mat
         personalized_recs.append({
             'book_id': book_id,
             'title': scores['title'],
-            'author': scores['author'],
+            'authors': scores['authors'],
             'genre': scores['genre'],
             'personalized_score': avg_score,
             'recommendation_count': scores['count'],

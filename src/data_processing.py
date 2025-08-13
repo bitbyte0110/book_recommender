@@ -13,7 +13,12 @@ def load_and_clean_data():
         # Try to load from raw data directory
         books_path = 'data/raw/books.csv'
         if os.path.exists(books_path):
-            books = pd.read_csv(books_path)
+            try:
+                books = pd.read_csv(books_path, on_bad_lines='skip')
+            except Exception as e:
+                print(f"Error loading books.csv: {e}")
+                print("Creating sample books data instead")
+                return create_sample_books()
         else:
             # Create sample data if no raw data exists
             books = create_sample_data()
@@ -41,22 +46,20 @@ def clean_book_data(books):
     
     # Handle missing values
     books_clean['title'] = books_clean['title'].fillna('Unknown Title')
-    books_clean['author'] = books_clean['author'].fillna('Unknown Author')
-    books_clean['description'] = books_clean['description'].fillna('No description available')
-    books_clean['genre'] = books_clean['genre'].fillna('Fiction')
+    books_clean['authors'] = books_clean['authors'].fillna('Unknown Author')
+    books_clean['publisher'] = books_clean['publisher'].fillna('Unknown Publisher')
+    books_clean['average_rating'] = books_clean['average_rating'].fillna(0.0)
     
     # Clean text fields
     books_clean['title'] = books_clean['title'].astype(str).str.strip()
-    books_clean['author'] = books_clean['author'].astype(str).str.strip()
-    books_clean['description'] = books_clean['description'].astype(str).str.strip()
-    books_clean['genre'] = books_clean['genre'].astype(str).str.strip()
+    books_clean['authors'] = books_clean['authors'].astype(str).str.strip()
+    books_clean['publisher'] = books_clean['publisher'].astype(str).str.strip()
     
     # Create combined features for content-based filtering
     books_clean['combined_features'] = (
         books_clean['title'] + ' ' + 
-        books_clean['author'] + ' ' + 
-        books_clean['description'] + ' ' + 
-        books_clean['genre']
+        books_clean['authors'] + ' ' + 
+        books_clean['publisher']
     )
     
     # Remove special characters and normalize
@@ -78,92 +81,90 @@ def create_sample_data():
         {
             'book_id': 1,
             'title': 'The Great Gatsby',
-            'author': 'F. Scott Fitzgerald',
-            'genre': 'Classic Fiction',
-            'description': 'A story of the fabulously wealthy Jay Gatsby and his love for the beautiful Daisy Buchanan.',
-            'rating': 4.2,
-            'pages': 180
+            'authors': 'F. Scott Fitzgerald',
+            'publisher': 'Scribner',
+            'average_rating': 4.2,
+            'num_pages': 180
         },
         {
             'book_id': 2,
             'title': 'To Kill a Mockingbird',
-            'author': 'Harper Lee',
-            'genre': 'Classic Fiction',
-            'description': 'The story of young Scout Finch and her father Atticus in a racially divided Alabama town.',
-            'rating': 4.3,
-            'pages': 281
+            'authors': 'Harper Lee',
+            'publisher': 'Grand Central',
+            'average_rating': 4.3,
+            'num_pages': 281
         },
         {
             'book_id': 3,
             'title': '1984',
-            'author': 'George Orwell',
-            'genre': 'Dystopian Fiction',
+            'authors': 'George Orwell',
+            'publisher': 'Signet',
             'description': 'A dystopian novel about totalitarianism and surveillance society.',
-            'rating': 4.1,
-            'pages': 328
+            'average_rating': 4.1,
+            'num_pages': 328
         },
         {
             'book_id': 4,
             'title': 'Pride and Prejudice',
-            'author': 'Jane Austen',
-            'genre': 'Romance',
+            'authors': 'Jane Austen',
+            'publisher': 'Penguin',
             'description': 'The story of Elizabeth Bennet and Mr. Darcy in Georgian-era England.',
-            'rating': 4.4,
-            'pages': 432
+            'average_rating': 4.4,
+            'num_pages': 432
         },
         {
             'book_id': 5,
             'title': 'The Hobbit',
-            'author': 'J.R.R. Tolkien',
-            'genre': 'Fantasy',
+            'authors': 'J.R.R. Tolkien',
+            'publisher': 'Houghton Mifflin',
             'description': 'Bilbo Baggins embarks on an adventure with thirteen dwarves to reclaim their homeland.',
-            'rating': 4.5,
-            'pages': 310
+            'average_rating': 4.5,
+            'num_pages': 310
         },
         {
             'book_id': 6,
             'title': 'The Catcher in the Rye',
-            'author': 'J.D. Salinger',
-            'genre': 'Coming-of-age Fiction',
+            'authors': 'J.D. Salinger',
+            'publisher': 'Little, Brown',
             'description': 'Holden Caulfield recounts his experiences in New York City after being expelled from prep school.',
-            'rating': 4.0,
-            'pages': 277
+            'average_rating': 4.0,
+            'num_pages': 277
         },
         {
             'book_id': 7,
             'title': 'Lord of the Flies',
-            'author': 'William Golding',
-            'genre': 'Allegorical Fiction',
+            'authors': 'William Golding',
+            'publisher': 'Penguin',
             'description': 'A group of British boys stranded on an uninhabited island try to govern themselves.',
-            'rating': 3.8,
-            'pages': 224
+            'average_rating': 3.8,
+            'num_pages': 224
         },
         {
             'book_id': 8,
             'title': 'Animal Farm',
-            'author': 'George Orwell',
-            'genre': 'Political Satire',
+            'authors': 'George Orwell',
+            'publisher': 'Signet',
             'description': 'A farm is taken over by its overworked, mistreated animals with a dream of equality.',
-            'rating': 4.0,
-            'pages': 112
+            'average_rating': 4.0,
+            'num_pages': 112
         },
         {
             'book_id': 9,
             'title': 'The Alchemist',
-            'author': 'Paulo Coelho',
-            'genre': 'Philosophical Fiction',
+            'authors': 'Paulo Coelho',
+            'publisher': 'HarperOne',
             'description': 'A shepherd boy named Santiago travels from his homeland in Spain to the Egyptian desert.',
-            'rating': 4.2,
-            'pages': 208
+            'average_rating': 4.2,
+            'num_pages': 208
         },
         {
             'book_id': 10,
             'title': 'Brave New World',
-            'author': 'Aldous Huxley',
-            'genre': 'Dystopian Fiction',
+            'authors': 'Aldous Huxley',
+            'publisher': 'Signet',
             'description': 'A futuristic society where people are genetically bred and pharmaceutically anesthetized.',
-            'rating': 4.1,
-            'pages': 311
+            'average_rating': 4.1,
+            'num_pages': 311
         }
     ]
     

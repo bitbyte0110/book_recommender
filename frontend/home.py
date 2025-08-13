@@ -26,20 +26,20 @@ def show_search_ui(books_df):
             placeholder="Enter book title or author name..."
         )
         
-        # Filter by genre
-        all_genres = get_genres(books_df)
-        selected_genres = st.multiselect(
-            "Filter by genre (optional):",
-            options=all_genres,
+        # Filter by publisher
+        all_publishers = get_genres(books_df)  # This now returns publishers
+        selected_publishers = st.multiselect(
+            "Filter by publisher (optional):",
+            options=all_publishers,
             default=[]
         )
         
-        # Filter books based on search and genre
+        # Filter books based on search and publisher
         filtered_books = books_df.copy()
         if search_term:
             filtered_books = search_books(filtered_books, search_term)
-        if selected_genres:
-            filtered_books = filter_books_by_genre(filtered_books, selected_genres)
+        if selected_publishers:
+            filtered_books = filter_books_by_genre(filtered_books, selected_publishers)  # Function name unchanged but filters by publisher
         
         # Display filtered books count
         st.info(f"Found {len(filtered_books)} books matching your criteria")
@@ -49,7 +49,7 @@ def show_search_ui(books_df):
             # Create a more user-friendly display for book selection
             book_options = []
             for _, book in filtered_books.iterrows():
-                display_text = f"{book['title']} by {book['author']} ({book['genre']})"
+                display_text = f"{book['title']} by {book['authors']} ({book['publisher']})"
                 book_options.append((display_text, book['title']))
             
             selected_display = st.selectbox(
@@ -105,18 +105,31 @@ def show_search_ui(books_df):
         # Show selected book info if available
         if selected_book:
             st.subheader("📖 Selected Book")
-            book_info = books_df[books_df['title'] == selected_book].iloc[0]
+            import re
+            escaped_title = re.escape(selected_book)
+            matches = books_df[books_df['title'].str.contains(escaped_title, regex=True, na=False)]
+            
+            if len(matches) == 0:
+                st.error("Book not found in database")
+                return selected_book, alpha, selected_publishers, num_recommendations
+            
+            # If multiple matches, prefer the one with the lowest book_id (usually the first one)
+            if len(matches) > 1:
+                # Sort by book_id and take the first one
+                matches = matches.sort_values('book_id')
+            
+            book_info = matches.iloc[0]
             
             st.write(f"**Title:** {book_info['title']}")
-            st.write(f"**Author:** {book_info['author']}")
-            st.write(f"**Genre:** {book_info['genre']}")
-            if 'rating' in book_info and book_info['rating'] > 0:
-                st.write(f"**Rating:** {book_info['rating']:.1f} ⭐")
+            st.write(f"**Author:** {book_info['authors']}")
+            st.write(f"**Publisher:** {book_info['publisher']}")
+            if 'average_rating' in book_info and book_info['average_rating'] > 0:
+                st.write(f"**Rating:** {book_info['average_rating']:.1f} ⭐")
             if 'description' in book_info:
                 with st.expander("📝 Description"):
                     st.write(book_info['description'])
     
-    return selected_book, alpha, selected_genres, num_recommendations
+    return selected_book, alpha, selected_publishers, num_recommendations
 
 def show_quick_stats(books_df):
     """
@@ -131,22 +144,22 @@ def show_quick_stats(books_df):
     
     with col1:
         st.metric("Total Books", len(books_df))
-        st.metric("Unique Authors", books_df['author'].nunique())
+        st.metric("Unique Authors", books_df['authors'].nunique())
     
     with col2:
-        st.metric("Genres", books_df['genre'].nunique())
-        avg_rating = books_df['rating'].mean() if 'rating' in books_df.columns else 0
+        st.metric("Publishers", books_df['publisher'].nunique())
+        avg_rating = books_df['average_rating'].mean() if 'average_rating' in books_df.columns else 0
         st.metric("Avg Rating", f"{avg_rating:.1f} ⭐" if avg_rating > 0 else "N/A")
     
-    # Genre distribution
-    st.sidebar.subheader("📚 Genre Distribution")
-    genre_counts = books_df['genre'].value_counts()
+    # Publisher distribution
+    st.sidebar.subheader("📚 Publisher Distribution")
+    publisher_counts = books_df['publisher'].value_counts()
     
-    for genre, count in genre_counts.head(5).items():
-        st.sidebar.write(f"• {genre}: {count}")
+    for publisher, count in publisher_counts.head(5).items():
+        st.sidebar.write(f"• {publisher}: {count}")
     
-    if len(genre_counts) > 5:
-        st.sidebar.write(f"... and {len(genre_counts) - 5} more genres")
+    if len(publisher_counts) > 5:
+        st.sidebar.write(f"... and {len(publisher_counts) - 5} more publishers")
 
 def show_advanced_options():
     """

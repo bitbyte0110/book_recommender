@@ -53,8 +53,20 @@ def get_collaborative_recommendations(book_title, books_df, item_similarity_matr
         recommendations: List of recommended book indices and scores
     """
     try:
-        # Find the book index
-        book_idx = books_df[books_df['title'].str.lower() == book_title.lower()].index[0]
+        # Find the book index (handle partial matches and duplicates)
+        import re
+        escaped_title = re.escape(book_title.lower())
+        matches = books_df[books_df['title'].str.lower().str.contains(escaped_title, regex=True, na=False)]
+        
+        if len(matches) == 0:
+            raise IndexError("Book not found")
+        
+        # If multiple matches, prefer the one with the lowest book_id (usually the first one)
+        if len(matches) > 1:
+            # Sort by book_id and take the first one
+            matches = matches.sort_values('book_id')
+        
+        book_idx = matches.index[0]
         
         # Get similarity scores for this book
         book_similarities = item_similarity_matrix[book_idx]
@@ -68,10 +80,10 @@ def get_collaborative_recommendations(book_title, books_df, item_similarity_matr
             recommendations.append({
                 'book_id': books_df.iloc[idx]['book_id'],
                 'title': books_df.iloc[idx]['title'],
-                'author': books_df.iloc[idx]['author'],
-                'genre': books_df.iloc[idx]['genre'],
+                'authors': books_df.iloc[idx]['authors'],
+                'genre': books_df.iloc[idx].get('publisher', 'Unknown'),
                 'similarity_score': book_similarities[idx],
-                'rating': books_df.iloc[idx].get('rating', 0)
+                'rating': books_df.iloc[idx].get('average_rating', 0)
             })
         
         return recommendations
@@ -124,10 +136,10 @@ def get_user_based_recommendations(user_id, user_item_matrix, books_df, top_n=10
             recommendations.append({
                 'book_id': book_id,
                 'title': book_info['title'],
-                'author': book_info['author'],
-                'genre': book_info['genre'],
+                'authors': book_info['authors'],
+                'genre': book_info.get('publisher', 'Unknown'),
                 'predicted_rating': predicted_rating,
-                'rating': book_info.get('rating', 0)
+                'rating': book_info.get('average_rating', 0)
             })
         
         return recommendations
@@ -195,6 +207,6 @@ def get_popular_books(ratings_df, books_df, top_n=10):
     popular_books = book_ratings.sort_values('rating_count', ascending=False).head(top_n)
     
     # Merge with book information
-    popular_books = popular_books.merge(books_df[['book_id', 'title', 'author', 'genre']], on='book_id')
+    popular_books = popular_books.merge(books_df[['book_id', 'title', 'authors']], on='book_id')
     
     return popular_books.to_dict('records')

@@ -47,16 +47,29 @@ def save_sim_matrix(similarity_matrix: np.ndarray, matrix_type: str) -> None:
 def load_books_data() -> pd.DataFrame:
     """
     Load cleaned books data.
+    Only loads books that have ratings to match similarity matrices.
     
     Returns:
         books_df: DataFrame with book information
     """
     try:
+        # Load ratings to get books that have ratings
+        ratings_df = pd.read_csv('data/processed/ratings.csv')
+        books_with_ratings = ratings_df['book_id'].unique()
+        
         filepath = 'data/processed/books_clean.csv'
         if os.path.exists(filepath):
-            return pd.read_csv(filepath)
+            books_df = pd.read_csv(filepath)
+            # Filter to only include books with ratings
+            books_df = books_df[books_df['book_id'].isin(books_with_ratings)].copy()
+            return books_df
         else:
-            raise FileNotFoundError("Cleaned books data not found")
+            # If no processed data exists, load and clean raw data
+            from .data_processing import load_and_clean_data
+            books_df = load_and_clean_data()
+            # Filter to only include books with ratings
+            books_df = books_df[books_df['book_id'].isin(books_with_ratings)].copy()
+            return books_df
     except Exception as e:
         print(f"Error loading books data: {e}")
         return pd.DataFrame()
@@ -92,30 +105,30 @@ def get_book_titles(books_df: pd.DataFrame) -> list:
 
 def get_genres(books_df: pd.DataFrame) -> list:
     """
-    Get list of unique genres.
+    Get list of unique publishers (since genre column doesn't exist).
     
     Args:
         books_df: DataFrame with book information
     
     Returns:
-        genres: List of unique genres
+        publishers: List of unique publishers
     """
-    return sorted(books_df['genre'].unique().tolist())
+    return sorted(books_df['publisher'].unique().tolist())
 
 def filter_books_by_genre(books_df: pd.DataFrame, selected_genres: list) -> pd.DataFrame:
     """
-    Filter books by selected genres.
+    Filter books by selected publishers (since genre column doesn't exist).
     
     Args:
         books_df: DataFrame with book information
-        selected_genres: List of genres to filter by
+        selected_genres: List of publishers to filter by
     
     Returns:
         filtered_df: Filtered DataFrame
     """
     if not selected_genres:
         return books_df
-    return books_df[books_df['genre'].isin(selected_genres)]
+    return books_df[books_df['publisher'].isin(selected_genres)]
 
 def search_books(books_df: pd.DataFrame, search_term: str) -> pd.DataFrame:
     """
@@ -134,7 +147,7 @@ def search_books(books_df: pd.DataFrame, search_term: str) -> pd.DataFrame:
     search_term = search_term.lower()
     mask = (
         books_df['title'].str.lower().str.contains(search_term, na=False) |
-        books_df['author'].str.lower().str.contains(search_term, na=False)
+        books_df['authors'].str.lower().str.contains(search_term, na=False)
     )
     return books_df[mask]
 
@@ -191,17 +204,17 @@ def calculate_recommendation_metrics(recommendations: list) -> dict:
     if not recommendations:
         return {}
     
-    genres = [rec['genre'] for rec in recommendations]
+    publishers = [rec.get('genre', 'Unknown') for rec in recommendations]  # Using genre field which contains publisher
     ratings = [rec.get('rating', 0) for rec in recommendations]
     scores = [rec.get('hybrid_score', 0) for rec in recommendations]
     
     metrics = {
         'total_recommendations': len(recommendations),
-        'unique_genres': len(set(genres)),
-        'genre_diversity': len(set(genres)) / len(genres) if genres else 0,
+        'unique_genres': len(set(publishers)),
+        'genre_diversity': len(set(publishers)) / len(publishers) if publishers else 0,
         'avg_rating': np.mean([r for r in ratings if r > 0]) if any(r > 0 for r in ratings) else 0,
         'avg_similarity_score': np.mean(scores) if scores else 0,
-        'genre_distribution': pd.Series(genres).value_counts().to_dict()
+        'genre_distribution': pd.Series(publishers).value_counts().to_dict()
     }
     
     return metrics
@@ -248,9 +261,9 @@ def validate_data_integrity(books_df: pd.DataFrame, ratings_df: pd.DataFrame) ->
     results = {
         'books_total': len(books_df),
         'books_with_missing_titles': books_df['title'].isna().sum(),
-        'books_with_missing_authors': books_df['author'].isna().sum(),
-        'books_with_missing_genres': books_df['genre'].isna().sum(),
-        'unique_genres': books_df['genre'].nunique(),
+        'books_with_missing_authors': books_df['authors'].isna().sum(),
+        'books_with_missing_publishers': books_df['publisher'].isna().sum(),
+        'unique_publishers': books_df['publisher'].nunique(),
         'ratings_total': len(ratings_df) if not ratings_df.empty else 0,
         'unique_users': ratings_df['user_id'].nunique() if not ratings_df.empty else 0,
         'unique_rated_books': ratings_df['book_id'].nunique() if not ratings_df.empty else 0,

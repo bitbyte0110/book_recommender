@@ -232,10 +232,10 @@ def main():
                 with cols[i % 3]:
                     with st.container():
                         st.markdown(f"**{book['title']}**")
-                        st.write(f"by {book['author']}")
-                        st.write(f"Genre: {book['genre']}")
-                        if 'rating' in book and book['rating'] > 0:
-                            st.write(f"Rating: {book['rating']:.1f} ⭐")
+                        st.write(f"by {book['authors']}")
+                        st.write(f"Publisher: {book['publisher']}")
+                        if 'average_rating' in book and book['average_rating'] > 0:
+                            st.write(f"Rating: {book['average_rating']:.1f} ⭐")
                         st.markdown("---")
     
     except Exception as e:

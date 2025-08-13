@@ -63,7 +63,7 @@ def display_recommendation_cards(recommendations, show_detailed_scores=False):
                 
                 # Book title and author
                 st.markdown(f"### {rec['title']}")
-                st.markdown(f"**by {rec['author']}**")
+                st.markdown(f"**by {rec['authors']}**")
                 
                 # Genre badge
                 st.markdown(f"<span style='background-color: #e1f5fe; padding: 2px 8px; border-radius: 12px; font-size: 0.8em;'>{rec['genre']}</span>", unsafe_allow_html=True)
@@ -210,7 +210,7 @@ def display_separate_recommendations(separate_recs):
         st.markdown("### 📖 Content-Based Recommendations")
         if separate_recs['content_based']:
             for i, rec in enumerate(separate_recs['content_based'][:5]):
-                st.write(f"{i+1}. **{rec['title']}** by {rec['author']}")
+                st.write(f"{i+1}. **{rec['title']}** by {rec['authors']}")
                 st.write(f"   Genre: {rec['genre']} | Score: {format_similarity_score(rec['similarity_score'])}")
         else:
             st.write("No content-based recommendations available.")
@@ -219,7 +219,7 @@ def display_separate_recommendations(separate_recs):
         st.markdown("### 🎯 Collaborative Recommendations")
         if separate_recs['collaborative']:
             for i, rec in enumerate(separate_recs['collaborative'][:5]):
-                st.write(f"{i+1}. **{rec['title']}** by {rec['author']}")
+                st.write(f"{i+1}. **{rec['title']}** by {rec['authors']}")
                 st.write(f"   Genre: {rec['genre']} | Score: {format_similarity_score(rec['similarity_score'])}")
         else:
             st.write("No collaborative recommendations available.")

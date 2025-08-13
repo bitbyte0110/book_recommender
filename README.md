@@ -14,23 +14,36 @@ A sophisticated book recommendation system that combines content-based and colla
 
 ```
 book_recommender/
-├── data/                   # Data storage
-│   ├── raw/               # Raw datasets (e.g., from Kaggle)
-│   └── processed/         # Processed data and similarity matrices
-├── models/                # Trained models (optional)
-├── src/                   # Core logic
-│   ├── data_processing.py # Data cleaning and preprocessing
-│   ├── content_based.py   # Content-based recommendation logic
-│   ├── collaborative.py   # Collaborative filtering logic
-│   ├── hybrid.py          # Hybrid weighted combination
-│   └── utils.py           # Helper functions
-├── frontend/              # Streamlit components
-│   ├── home.py            # Main page UI
-│   └── results.py         # Recommendation display UI
-├── app.py                 # Main Streamlit app
-├── requirements.txt       # Dependencies
-└── README.md              # Project documentation
+├── 📄 app.py                    # Main Streamlit application
+├── 📄 requirements.txt          # Python dependencies
+├── 📄 README.md                 # Project documentation
+├── 📄 LICENSE                   # Project license
+├── 📄 .gitignore               # Git ignore rules
+│
+├── 📁 src/                     # Core recommendation system
+│   ├── 📄 data_processing.py   # Data loading and preprocessing
+│   ├── 📄 content_based.py     # Content-based filtering
+│   ├── 📄 collaborative.py     # Collaborative filtering
+│   ├── 📄 hybrid.py           # Hybrid recommendation logic
+│   ├── 📄 training.py         # Model training pipeline
+│   └── 📄 utils.py            # Utility functions
+│
+├── 📁 frontend/                # Streamlit UI components
+│   ├── 📄 home.py             # Main search interface
+│   ├── 📄 results.py          # Results display
+│   └── 📁 assets/             # Static assets
+│
+├── 📁 data/                    # Data storage
+│   ├── 📁 raw/                # Original datasets
+│   └── 📁 processed/          # Cleaned data and matrices
+│
+├── 📁 models/                  # Trained models
+├── 📁 evaluation/              # Evaluation framework
+├── 📁 scripts/                 # Utility scripts
+└── 📁 docs/                    # Documentation
 ```
+
+📖 **Detailed structure**: See [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md)
 
 ## 🚀 Quick Start
 
@@ -40,6 +53,19 @@ book_recommender/
 - pip package manager
 
 ### Installation
+
+#### **Option 1: Automatic Installation (Recommended)**
+
+**Windows Users:**
+- Double-click `install.bat` in the project folder
+- Or right-click `install_dependencies.ps1` → "Run with PowerShell"
+
+**Linux/macOS Users:**
+```bash
+chmod +x install_dependencies.sh && ./install_dependencies.sh
+```
+
+#### **Option 2: Manual Installation**
 
 1. **Clone the repository**
    ```bash
@@ -59,6 +85,11 @@ book_recommender/
 
 4. **Open your browser**
    Navigate to `http://localhost:8501`
+
+📖 **Detailed guides**: 
+- See [`docs/QUICK_START.md`](docs/QUICK_START.md) for usage instructions
+- See [`docs/INSTALLATION.md`](docs/INSTALLATION.md) for detailed installation guide
+- See [`docs/FILE_INDEX.md`](docs/FILE_INDEX.md) for comprehensive file index
 
 ## 📖 How It Works
 
