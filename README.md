@@ -320,7 +320,7 @@ py -m pip install -r requirements.txt
 
 ### Sample Data
 The system includes sample book data with:
-- 10 classic books with metadata
+- 20 classic books with metadata
 - 100 simulated users with ratings
 - Pre-computed similarity matrices
 
