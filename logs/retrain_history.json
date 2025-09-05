@@ -1,0 +1,34 @@
+{
+  "retrain_events": [
+    {
+      "type": "full",
+      "books_count": 20,
+      "ratings_count": 1038,
+      "performance": {
+        "rmse": 3.2691742076555066,
+        "mae": 2.9182692307692326,
+        "precision": 0.11891891891891888,
+        "recall": 1.0,
+        "f1": 0.21048321048321045,
+        "coverage": 0.85,
+        "diversity": 0.9508999362314201
+      },
+      "success": true,
+      "timestamp": "2025-09-05T09:43:26.028841",
+      "event_id": 1
+    }
+  ],
+  "total_retrains": 1,
+  "last_retrain": "2025-09-05T09:43:26.028841",
+  "performance_trends": [
+    {
+      "rmse": 3.2691742076555066,
+      "mae": 2.9182692307692326,
+      "precision": 0.11891891891891888,
+      "recall": 1.0,
+      "f1": 0.21048321048321045,
+      "coverage": 0.85,
+      "diversity": 0.9508999362314201
+    }
+  ]
+}

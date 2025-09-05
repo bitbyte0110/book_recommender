@@ -12,6 +12,11 @@ import json
 import joblib
 import pandas as pd
 import numpy as np
+
+# Add src to path
+sys.path.append('src')
+sys.path.append('.')
+
 from src.training import HybridRecommenderTrainer
 from evaluation.metrics import RecommenderEvaluator
 
@@ -20,7 +25,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('retrain.log'),
+        logging.FileHandler('logs/retrain.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )
@@ -35,7 +40,7 @@ class ModelRetrainer:
         self.data_dir = data_dir
         self.models_dir = models_dir
         self.metadata_file = os.path.join(models_dir, 'training_metadata.pkl')
-        self.retrain_log_file = 'retrain_history.json'
+        self.retrain_log_file = 'logs/retrain_history.json'
         
         # Initialize retrain history
         self._initialize_retrain_history()
@@ -246,7 +251,7 @@ class ModelRetrainer:
         
         # Check data freshness
         try:
-            ratings_file = os.path.join(self.data_dir, 'processed', 'ratings_clean.csv')
+            ratings_file = os.path.join(self.data_dir, 'processed', 'ratings.csv')
             if os.path.exists(ratings_file):
                 ratings_df = pd.read_csv(ratings_file)
                 if len(ratings_df) > 0:

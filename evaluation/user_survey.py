@@ -81,13 +81,13 @@ class UserSatisfactionSurvey:
         
         return response_data['response_id']
     
-    def calculate_satisfaction_score(self, relevance_score, accuracy_score, diversity_score):
+    def calculate_satisfaction_score(self, relevance_score, accuracy, diversity_score):
         """
         Calculate overall satisfaction score
         """
         # Weighted combination of different aspects
         satisfaction = (0.4 * relevance_score + 
-                       0.3 * accuracy_score + 
+                       0.3 * accuracy + 
                        0.3 * diversity_score)
         return round(satisfaction, 2)
     
@@ -310,8 +310,8 @@ class UserSatisfactionSurvey:
             
             df = pd.DataFrame(data['responses'])
             
-            # Check if required columns exist
-            required_columns = ['satisfaction_score', 'relevance_score', 'accuracy_score', 'diversity_score', 'usage_frequency']
+            # Check if required columns exist and handle column name mapping
+            required_columns = ['satisfaction_score', 'relevance_score', 'accuracy', 'diversity_score', 'usage_frequency']
             missing_columns = [col for col in required_columns if col not in df.columns]
             
             if missing_columns:
@@ -335,7 +335,7 @@ class UserSatisfactionSurvey:
             # Component scores
             component_scores = {
                 'relevance': df['relevance_score'].mean(),
-                'accuracy': df['accuracy_score'].mean(),
+                'accuracy': df['accuracy'].mean(),
                 'diversity': df['diversity_score'].mean()
             }
             

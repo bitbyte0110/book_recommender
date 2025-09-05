@@ -70,7 +70,7 @@ class HybridRecommenderTrainer:
         # Save cleaned data
         os.makedirs(os.path.join(self.data_dir, 'processed'), exist_ok=True)
         books_clean.to_csv(os.path.join(self.data_dir, 'processed', 'books_clean.csv'), index=False)
-        ratings_clean.to_csv(os.path.join(self.data_dir, 'processed', 'ratings_clean.csv'), index=False)
+        ratings_clean.to_csv(os.path.join(self.data_dir, 'processed', 'ratings.csv'), index=False)
         
         return books_clean, ratings_clean
     
@@ -150,11 +150,15 @@ class HybridRecommenderTrainer:
         
         print(f"After filtering valid ratings: {len(ratings_df)} ratings")
         
-        # Create mapping from ISBN to book_id
-        isbn_to_book_id = books_df.set_index('isbn')['book_id'].to_dict()
-        
-        # Map ratings book_id (ISBN) to actual book_id
-        ratings_df['book_id'] = ratings_df['book_id'].map(isbn_to_book_id)
+        # Check if we need to map ISBN to book_id or if book_id is already correct
+        if 'isbn' in books_df.columns:
+            # Create mapping from ISBN to book_id
+            isbn_to_book_id = books_df.set_index('isbn')['book_id'].to_dict()
+            # Map ratings book_id (ISBN) to actual book_id
+            ratings_df['book_id'] = ratings_df['book_id'].map(isbn_to_book_id)
+        else:
+            # book_id is already correct, just ensure it's numeric
+            ratings_df['book_id'] = pd.to_numeric(ratings_df['book_id'], errors='coerce')
         
         # Remove ratings for books not found in books_df
         ratings_df = ratings_df.dropna(subset=['book_id'])
@@ -179,13 +183,23 @@ class HybridRecommenderTrainer:
             {'book_id': 1, 'title': 'The Great Gatsby', 'authors': 'F. Scott Fitzgerald', 'average_rating': 4.2, 'publisher': 'Scribner'},
             {'book_id': 2, 'title': 'To Kill a Mockingbird', 'authors': 'Harper Lee', 'average_rating': 4.3, 'publisher': 'Grand Central'},
             {'book_id': 3, 'title': '1984', 'authors': 'George Orwell', 'average_rating': 4.1, 'publisher': 'Signet'},
-            {'book_id': 4, 'title': 'Pride and Prejudice', 'authors': 'Jane Austen', 'average_rating': 4.2, 'publisher': 'Penguin'},
-            {'book_id': 5, 'title': 'The Hobbit', 'authors': 'J.R.R. Tolkien', 'average_rating': 4.4, 'publisher': 'Houghton Mifflin'},
-            {'book_id': 6, 'title': 'The Catcher in the Rye', 'authors': 'J.D. Salinger', 'average_rating': 3.8, 'publisher': 'Little, Brown'},
-            {'book_id': 7, 'title': 'Lord of the Flies', 'authors': 'William Golding', 'average_rating': 3.7, 'publisher': 'Penguin'},
-            {'book_id': 8, 'title': 'Animal Farm', 'authors': 'George Orwell', 'average_rating': 3.9, 'publisher': 'Signet'},
-            {'book_id': 9, 'title': 'Brave New World', 'authors': 'Aldous Huxley', 'average_rating': 3.9, 'publisher': 'Harper'},
-            {'book_id': 10, 'title': 'The Alchemist', 'authors': 'Paulo Coelho', 'average_rating': 3.9, 'publisher': 'HarperOne'}
+            {'book_id': 4, 'title': 'Pride and Prejudice', 'authors': 'Jane Austen', 'average_rating': 4.4, 'publisher': 'Penguin'},
+            {'book_id': 5, 'title': 'The Hobbit', 'authors': 'J.R.R. Tolkien', 'average_rating': 4.5, 'publisher': 'Houghton Mifflin'},
+            {'book_id': 6, 'title': 'The Catcher in the Rye', 'authors': 'J.D. Salinger', 'average_rating': 4.0, 'publisher': 'Little, Brown'},
+            {'book_id': 7, 'title': 'Lord of the Flies', 'authors': 'William Golding', 'average_rating': 3.8, 'publisher': 'Penguin'},
+            {'book_id': 8, 'title': 'Animal Farm', 'authors': 'George Orwell', 'average_rating': 4.0, 'publisher': 'Signet'},
+            {'book_id': 9, 'title': 'The Alchemist', 'authors': 'Paulo Coelho', 'average_rating': 4.2, 'publisher': 'HarperOne'},
+            {'book_id': 10, 'title': 'Brave New World', 'authors': 'Aldous Huxley', 'average_rating': 4.1, 'publisher': 'Signet'},
+            {'book_id': 11, 'title': 'The Lord of the Rings', 'authors': 'J.R.R. Tolkien', 'average_rating': 4.6, 'publisher': 'Houghton Mifflin'},
+            {'book_id': 12, 'title': 'Harry Potter and the Sorcerer\'s Stone', 'authors': 'J.K. Rowling', 'average_rating': 4.5, 'publisher': 'Scholastic'},
+            {'book_id': 13, 'title': 'The Chronicles of Narnia', 'authors': 'C.S. Lewis', 'average_rating': 4.3, 'publisher': 'HarperCollins'},
+            {'book_id': 14, 'title': 'The Handmaid\'s Tale', 'authors': 'Margaret Atwood', 'average_rating': 4.2, 'publisher': 'Anchor'},
+            {'book_id': 15, 'title': 'The Kite Runner', 'authors': 'Khaled Hosseini', 'average_rating': 4.4, 'publisher': 'Riverhead Books'},
+            {'book_id': 16, 'title': 'The Book Thief', 'authors': 'Markus Zusak', 'average_rating': 4.3, 'publisher': 'Knopf'},
+            {'book_id': 17, 'title': 'The Giver', 'authors': 'Lois Lowry', 'average_rating': 4.1, 'publisher': 'Houghton Mifflin'},
+            {'book_id': 18, 'title': 'The Fault in Our Stars', 'authors': 'John Green', 'average_rating': 4.2, 'publisher': 'Dutton Books'},
+            {'book_id': 19, 'title': 'The Hunger Games', 'authors': 'Suzanne Collins', 'average_rating': 4.3, 'publisher': 'Scholastic'},
+            {'book_id': 20, 'title': 'The Da Vinci Code', 'authors': 'Dan Brown', 'average_rating': 3.9, 'publisher': 'Doubleday'}
         ]
         return pd.DataFrame(sample_books)
     
@@ -257,8 +271,8 @@ class HybridRecommenderTrainer:
             fill_value=0
         )
         
-        # SVD parameters
-        n_components = kwargs.get('n_factors', 50)
+        # SVD parameters - ensure n_components doesn't exceed matrix dimensions
+        n_components = min(kwargs.get('n_factors', 50), user_item_matrix.shape[1], user_item_matrix.shape[0])
         
         # Create TruncatedSVD model
         self.collab_model = TruncatedSVD(
@@ -319,7 +333,10 @@ class HybridRecommenderTrainer:
         print(f"Best content-based parameters: {best_content_params}")
         
         # Collaborative filtering tuning (simplified)
-        best_collab_params = {'n_factors': 50}  # Default parameters
+        # Use min of 50 or number of users/2 to avoid component issues
+        n_users = ratings_df['user_id'].nunique()
+        n_factors = min(50, max(5, n_users // 2))
+        best_collab_params = {'n_factors': n_factors}
         
         print(f"Best collaborative parameters: {best_collab_params}")
         
@@ -344,7 +361,8 @@ class HybridRecommenderTrainer:
         )
         
         # Simple cross-validation for TruncatedSVD
-        svd = TruncatedSVD(n_components=50, random_state=42)
+        n_components = min(50, user_item_matrix.shape[1], user_item_matrix.shape[0])
+        svd = TruncatedSVD(n_components=n_components, random_state=42)
         
         # Calculate explained variance ratio
         svd.fit(user_item_matrix)
@@ -404,7 +422,7 @@ class HybridRecommenderTrainer:
             print("No trained models found")
             return False
     
-    def train_full_pipeline(self, use_hyperparameter_tuning=True, use_cross_validation=True):
+    def train_full_pipeline(self, use_hyperparameter_tuning=True, use_cross_validation=True, custom_params=None):
         """
         Complete training pipeline
         """
@@ -414,7 +432,17 @@ class HybridRecommenderTrainer:
         books_df, ratings_df = self.load_and_preprocess_data()
         
         # Hyperparameter tuning
-        if use_hyperparameter_tuning:
+        if custom_params:
+            # Use custom parameters
+            best_content_params = {
+                'max_features': custom_params.get('content_max_features', 3000),
+                'ngram_range': custom_params.get('content_ngram_range', (1, 1)),
+                'min_df': custom_params.get('content_min_df', 2)
+            }
+            best_collab_params = {
+                'n_factors': custom_params.get('collab_n_factors', 50)
+            }
+        elif use_hyperparameter_tuning:
             best_content_params, best_collab_params = self.hyperparameter_tuning(ratings_df, books_df)
         else:
             best_content_params = {}

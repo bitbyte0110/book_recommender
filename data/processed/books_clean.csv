@@ -1,0 +1,21 @@
+book_id,title,authors,average_rating,publisher,combined_features
+1,The Great Gatsby,F. Scott Fitzgerald,4.2,Scribner,the great gatsby f scott fitzgerald scribner
+2,To Kill a Mockingbird,Harper Lee,4.3,Grand Central,to kill a mockingbird harper lee grand central
+3,1984,George Orwell,4.1,Signet,1984 george orwell signet
+4,Pride and Prejudice,Jane Austen,4.4,Penguin,pride and prejudice jane austen penguin
+5,The Hobbit,J.R.R. Tolkien,4.5,Houghton Mifflin,the hobbit j r r tolkien houghton mifflin
+6,The Catcher in the Rye,J.D. Salinger,4.0,"Little, Brown",the catcher in the rye j d salinger little brown
+7,Lord of the Flies,William Golding,3.8,Penguin,lord of the flies william golding penguin
+8,Animal Farm,George Orwell,4.0,Signet,animal farm george orwell signet
+9,The Alchemist,Paulo Coelho,4.2,HarperOne,the alchemist paulo coelho harperone
+10,Brave New World,Aldous Huxley,4.1,Signet,brave new world aldous huxley signet
+11,The Lord of the Rings,J.R.R. Tolkien,4.6,Houghton Mifflin,the lord of the rings j r r tolkien houghton mifflin
+12,Harry Potter and the Sorcerer's Stone,J.K. Rowling,4.5,Scholastic,harry potter and the sorcerer s stone j k rowling scholastic
+13,The Chronicles of Narnia,C.S. Lewis,4.3,HarperCollins,the chronicles of narnia c s lewis harpercollins
+14,The Handmaid's Tale,Margaret Atwood,4.2,Anchor,the handmaid s tale margaret atwood anchor
+15,The Kite Runner,Khaled Hosseini,4.4,Riverhead Books,the kite runner khaled hosseini riverhead books
+16,The Book Thief,Markus Zusak,4.3,Knopf,the book thief markus zusak knopf
+17,The Giver,Lois Lowry,4.1,Houghton Mifflin,the giver lois lowry houghton mifflin
+18,The Fault in Our Stars,John Green,4.2,Dutton Books,the fault in our stars john green dutton books
+19,The Hunger Games,Suzanne Collins,4.3,Scholastic,the hunger games suzanne collins scholastic
+20,The Da Vinci Code,Dan Brown,3.9,Doubleday,the da vinci code dan brown doubleday

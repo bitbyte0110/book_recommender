@@ -15,13 +15,15 @@ def create_content_similarity_matrix(books_df):
         similarity_matrix: Cosine similarity matrix
         tfidf_matrix: TF-IDF matrix for later use
     """
-    # Initialize TF-IDF vectorizer
+    # Initialize TF-IDF vectorizer with better parameters for small dataset
     tfidf = TfidfVectorizer(
         stop_words='english',
-        max_features=5000,
-        ngram_range=(1, 2),
-        min_df=1,
-        max_df=0.9
+        max_features=1000,  # Reduced for small dataset
+        ngram_range=(1, 3),  # Include trigrams for better matching
+        min_df=1,  # Allow all terms
+        max_df=0.95,  # Allow more common terms
+        sublinear_tf=True,  # Use sublinear TF scaling
+        norm='l2'  # L2 normalization
     )
     
     # Fit and transform the combined features
@@ -76,7 +78,8 @@ def get_content_based_recommendations(book_title, books_df, similarity_matrix, t
                 'authors': books_df.iloc[idx]['authors'],
                 'genre': books_df.iloc[idx].get('publisher', 'Unknown'),
                 'similarity_score': book_similarities[idx],
-                'rating': books_df.iloc[idx].get('average_rating', 0)
+                'rating': books_df.iloc[idx].get('average_rating', 0),
+                'method': 'content_based'
             })
         
         return recommendations
@@ -130,7 +133,7 @@ def get_book_features(books_df, book_title):
             'title': book['title'],
             'authors': book['authors'],
             'genre': book.get('publisher', 'Unknown'),
-            'description': book.get('description', ''),
+            'description': book.get('description', 'No description available'),
             'rating': book.get('average_rating', 0),
             'pages': book.get('num_pages', 0)
         }

@@ -1,0 +1,10 @@
+2025-09-05 09:43:25,219 - INFO - Starting model retraining...
+2025-09-05 09:43:25,219 - INFO - Performing full retraining...
+2025-09-05 09:43:26,029 - INFO - Model retraining completed successfully!
+2025-09-05 09:43:26,030 - INFO - New performance - RMSE: 3.2692, F1: 0.2105
+2025-09-05 09:43:26,049 - INFO - Model age: 0 days
+2025-09-05 09:43:26,050 - INFO - Model is 0 days old. No retraining needed.
+2025-09-05 09:43:26,067 - INFO - Insufficient performance history for drift detection.
+2025-09-05 09:43:26,631 - INFO - Model age: 0 days
+2025-09-05 09:43:26,631 - INFO - Model is 0 days old. No retraining needed.
+2025-09-05 09:43:26,632 - INFO - Insufficient performance history for drift detection.

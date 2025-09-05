@@ -30,7 +30,7 @@ class RecommenderEvaluator:
         """
         # Load data
         books_df = pd.read_csv(os.path.join(self.data_dir, 'processed', 'books_clean.csv'))
-        ratings_df = pd.read_csv(os.path.join(self.data_dir, 'processed', 'ratings_clean.csv'))
+        ratings_df = pd.read_csv(os.path.join(self.data_dir, 'processed', 'ratings.csv'))
         
         # Load models
         content_sim_matrix = joblib.load(os.path.join(self.models_dir, 'content_similarity_matrix.pkl'))

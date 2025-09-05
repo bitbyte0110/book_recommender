@@ -10,9 +10,11 @@ import json
 from datetime import datetime
 import pandas as pd
 import numpy as np
+import shutil
 
 # Add src to path
 sys.path.append('src')
+sys.path.append('.')
 
 from src.training import HybridRecommenderTrainer
 from evaluation.metrics import RecommenderEvaluator
@@ -23,6 +25,18 @@ def print_header(title):
     print("\n" + "="*80)
     print(f" {title}")
     print("="*80)
+
+def cleanup_pycache():
+    """Clean up __pycache__ directories"""
+    for root, dirs, files in os.walk('.'):
+        for dir_name in dirs[:]:  # Use slice to avoid modifying list while iterating
+            if dir_name == '__pycache__':
+                pycache_path = os.path.join(root, dir_name)
+                try:
+                    shutil.rmtree(pycache_path)
+                    print(f"Cleaned up: {pycache_path}")
+                except Exception as e:
+                    print(f"Could not remove {pycache_path}: {e}")
 
 def print_section(title):
     """Print formatted section"""
@@ -214,6 +228,9 @@ def main():
         print("3. Run user satisfaction surveys")
         print("4. Set up automated retraining pipeline")
         print("5. Monitor system performance over time")
+        
+        # Clean up __pycache__ directories
+        cleanup_pycache()
         
         return True
         

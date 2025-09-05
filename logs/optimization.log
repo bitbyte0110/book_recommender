@@ -1,0 +1,338 @@
+2025-09-05 09:44:57,250 - INFO - Starting model optimization...
+2025-09-05 09:44:57,250 - INFO - Generated 180 configuration variations
+2025-09-05 09:44:57,251 - INFO - 
+--- Iteration 1/180 ---
+2025-09-05 09:44:57,251 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:45:00,872 - INFO - Performance - F1: 0.2029, RMSE: 2.9757, Composite: 0.4403
+2025-09-05 09:45:00,910 - INFO - Best Alpha: 0.0
+2025-09-05 09:45:00,911 - INFO - F1: 0.2029, RMSE: 2.9757
+2025-09-05 09:45:16,827 - INFO - Starting model optimization...
+2025-09-05 09:45:16,827 - INFO - Generated 180 configuration variations
+2025-09-05 09:45:16,827 - INFO - 
+--- Iteration 1/180 ---
+2025-09-05 09:45:16,827 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:45:40,134 - INFO - Starting model optimization...
+2025-09-05 09:45:40,134 - INFO - Generated 180 configuration variations
+2025-09-05 09:45:40,134 - INFO - 
+--- Iteration 1/180 ---
+2025-09-05 09:45:40,134 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:45:43,640 - INFO - Performance - F1: 0.2029, RMSE: 2.9757, Composite: 0.4403
+2025-09-05 09:45:43,640 - INFO - NEW BEST PERFORMANCE! Composite Score: 0.4403
+2025-09-05 09:45:43,640 - INFO - Best Alpha: 0.0
+2025-09-05 09:45:43,641 - INFO - F1: 0.2029, RMSE: 2.9757
+2025-09-05 09:45:55,309 - INFO - Starting model optimization...
+2025-09-05 09:45:55,309 - INFO - Generated 180 configuration variations
+2025-09-05 09:45:55,309 - INFO - 
+--- Iteration 1/180 ---
+2025-09-05 09:45:55,309 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:45:58,766 - INFO - Performance - F1: 0.2029, RMSE: 2.9757, Composite: 0.4403
+2025-09-05 09:45:58,767 - INFO - NEW BEST PERFORMANCE! Composite Score: 0.4403
+2025-09-05 09:45:58,767 - INFO - Best Alpha: 0.0
+2025-09-05 09:45:58,767 - INFO - F1: 0.2029, RMSE: 2.9757
+2025-09-05 09:45:58,770 - INFO - 
+--- Iteration 2/180 ---
+2025-09-05 09:45:58,771 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 20, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:02,069 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 09:46:02,070 - INFO - No significant improvement (count: 1)
+2025-09-05 09:46:02,094 - INFO - 
+--- Iteration 3/180 ---
+2025-09-05 09:46:02,094 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 30, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:05,690 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 09:46:05,690 - INFO - No significant improvement (count: 2)
+2025-09-05 09:46:05,692 - INFO - 
+--- Iteration 4/180 ---
+2025-09-05 09:46:05,692 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 40, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:09,152 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 09:46:09,152 - INFO - No significant improvement (count: 3)
+2025-09-05 09:46:09,172 - INFO - 
+--- Iteration 5/180 ---
+2025-09-05 09:46:09,173 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 50, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:09,811 - INFO - Starting model optimization...
+2025-09-05 09:46:09,811 - INFO - Generated 180 configuration variations
+2025-09-05 09:46:09,811 - INFO - 
+--- Iteration 1/180 ---
+2025-09-05 09:46:09,811 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:11,930 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 09:46:11,930 - INFO - No significant improvement (count: 4)
+2025-09-05 09:46:11,948 - INFO - 
+--- Iteration 6/180 ---
+2025-09-05 09:46:11,948 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:12,439 - INFO - Performance - F1: 0.2029, RMSE: 2.9757, Composite: 0.4403
+2025-09-05 09:46:12,439 - INFO - NEW BEST PERFORMANCE! Composite Score: 0.4403
+2025-09-05 09:46:12,440 - INFO - Best Alpha: 0.0
+2025-09-05 09:46:12,440 - INFO - F1: 0.2029, RMSE: 2.9757
+2025-09-05 09:46:12,457 - INFO - 
+--- Iteration 2/180 ---
+2025-09-05 09:46:12,458 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 20, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:14,456 - INFO - Performance - F1: 0.2105, RMSE: 2.9757, Composite: 0.4380
+2025-09-05 09:46:14,457 - INFO - No significant improvement (count: 5)
+2025-09-05 09:46:14,480 - INFO - 
+--- Iteration 7/180 ---
+2025-09-05 09:46:14,480 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 20, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:14,874 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 09:46:14,874 - INFO - No significant improvement (count: 1)
+2025-09-05 09:46:14,893 - INFO - 
+--- Iteration 3/180 ---
+2025-09-05 09:46:14,893 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 30, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:16,933 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 09:46:16,933 - INFO - No significant improvement (count: 6)
+2025-09-05 09:46:16,952 - INFO - 
+--- Iteration 8/180 ---
+2025-09-05 09:46:16,953 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 30, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:17,333 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 09:46:17,333 - INFO - No significant improvement (count: 2)
+2025-09-05 09:46:17,350 - INFO - 
+--- Iteration 4/180 ---
+2025-09-05 09:46:17,351 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 40, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:19,544 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 09:46:19,544 - INFO - No significant improvement (count: 7)
+2025-09-05 09:46:19,563 - INFO - 
+--- Iteration 9/180 ---
+2025-09-05 09:46:19,564 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 40, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:19,814 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 09:46:19,814 - INFO - No significant improvement (count: 3)
+2025-09-05 09:46:19,834 - INFO - 
+--- Iteration 5/180 ---
+2025-09-05 09:46:19,835 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 50, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:22,076 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 09:46:22,077 - INFO - No significant improvement (count: 8)
+2025-09-05 09:46:22,098 - INFO - 
+--- Iteration 10/180 ---
+2025-09-05 09:46:22,098 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 50, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:22,363 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 09:46:22,363 - INFO - No significant improvement (count: 4)
+2025-09-05 09:46:22,387 - INFO - 
+--- Iteration 6/180 ---
+2025-09-05 09:46:22,387 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:24,702 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 09:46:24,702 - INFO - No significant improvement (count: 9)
+2025-09-05 09:46:24,724 - INFO - 
+--- Iteration 11/180 ---
+2025-09-05 09:46:24,725 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 3, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:25,049 - INFO - Performance - F1: 0.2105, RMSE: 2.9757, Composite: 0.4380
+2025-09-05 09:46:25,050 - INFO - No significant improvement (count: 5)
+2025-09-05 09:46:25,075 - INFO - 
+--- Iteration 7/180 ---
+2025-09-05 09:46:25,075 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 20, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:27,396 - INFO - Performance - F1: 0.2201, RMSE: 2.9757, Composite: 0.4163
+2025-09-05 09:46:27,397 - INFO - No significant improvement (count: 10)
+2025-09-05 09:46:27,419 - INFO - No improvement for 10 iterations. Stopping optimization.
+2025-09-05 09:46:27,420 - INFO - 
+================================================================================
+2025-09-05 09:46:27,420 - INFO - OPTIMIZATION COMPLETED
+2025-09-05 09:46:27,420 - INFO - ================================================================================
+2025-09-05 09:46:27,421 - INFO - Total iterations: 11
+2025-09-05 09:46:27,421 - INFO - Total time: 32.11 seconds
+2025-09-05 09:46:27,424 - INFO - Composite Score: 0.4403
+2025-09-05 09:46:27,424 - INFO - F1-Score: 0.2029
+2025-09-05 09:46:27,424 - INFO - Precision: 0.1139
+2025-09-05 09:46:27,424 - INFO - Recall: 1.0000
+2025-09-05 09:46:27,424 - INFO - RMSE: 2.9757
+2025-09-05 09:46:27,425 - INFO - Coverage: 0.8500
+2025-09-05 09:46:27,425 - INFO - Diversity: 0.9879
+2025-09-05 09:46:27,425 - INFO - Best Alpha: 0.0
+2025-09-05 09:46:27,426 - INFO -   content_max_features: 1000
+2025-09-05 09:46:27,427 - INFO -   content_ngram_range: (1, 1)
+2025-09-05 09:46:27,427 - INFO -   content_min_df: 1
+2025-09-05 09:46:27,427 - INFO -   collab_n_factors: 10
+2025-09-05 09:46:27,427 - INFO -   alpha_values: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+2025-09-05 09:46:27,761 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 09:46:27,761 - INFO - No significant improvement (count: 6)
+2025-09-05 09:46:27,787 - INFO - 
+--- Iteration 8/180 ---
+2025-09-05 09:46:27,788 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 30, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:30,518 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 09:46:30,518 - INFO - No significant improvement (count: 7)
+2025-09-05 09:46:30,547 - INFO - 
+--- Iteration 9/180 ---
+2025-09-05 09:46:30,548 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 40, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:33,253 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 09:46:33,253 - INFO - No significant improvement (count: 8)
+2025-09-05 09:46:33,278 - INFO - 
+--- Iteration 10/180 ---
+2025-09-05 09:46:33,279 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 50, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:36,071 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 09:46:36,071 - INFO - No significant improvement (count: 9)
+2025-09-05 09:46:36,094 - INFO - 
+--- Iteration 11/180 ---
+2025-09-05 09:46:36,094 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 3, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 09:46:38,859 - INFO - Performance - F1: 0.2201, RMSE: 2.9757, Composite: 0.4163
+2025-09-05 09:46:38,859 - INFO - No significant improvement (count: 10)
+2025-09-05 09:46:38,884 - INFO - No improvement for 10 iterations. Stopping optimization.
+2025-09-05 09:46:38,884 - INFO - 
+================================================================================
+2025-09-05 09:46:38,884 - INFO - OPTIMIZATION COMPLETED
+2025-09-05 09:46:38,885 - INFO - ================================================================================
+2025-09-05 09:46:38,885 - INFO - Total iterations: 11
+2025-09-05 09:46:38,885 - INFO - Total time: 29.07 seconds
+2025-09-05 09:46:38,888 - INFO - Composite Score: 0.4403
+2025-09-05 09:46:38,888 - INFO - F1-Score: 0.2029
+2025-09-05 09:46:38,889 - INFO - Precision: 0.1139
+2025-09-05 09:46:38,889 - INFO - Recall: 1.0000
+2025-09-05 09:46:38,889 - INFO - RMSE: 2.9757
+2025-09-05 09:46:38,889 - INFO - Coverage: 0.8500
+2025-09-05 09:46:38,890 - INFO - Diversity: 0.9879
+2025-09-05 09:46:38,890 - INFO - Best Alpha: 0.0
+2025-09-05 09:46:38,892 - INFO -   content_max_features: 1000
+2025-09-05 09:46:38,892 - INFO -   content_ngram_range: (1, 1)
+2025-09-05 09:46:38,892 - INFO -   content_min_df: 1
+2025-09-05 09:46:38,892 - INFO -   collab_n_factors: 10
+2025-09-05 09:46:38,892 - INFO -   alpha_values: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+2025-09-05 12:00:44,269 - INFO - Starting model optimization...
+2025-09-05 12:00:44,269 - INFO - Generated 180 configuration variations
+2025-09-05 12:00:44,269 - INFO - 
+--- Iteration 1/180 ---
+2025-09-05 12:00:44,269 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:00:48,052 - INFO - Performance - F1: 0.2029, RMSE: 2.9757, Composite: 0.4403
+2025-09-05 12:00:48,052 - INFO - NEW BEST PERFORMANCE! Composite Score: 0.4403
+2025-09-05 12:00:48,052 - INFO - Best Alpha: 0.0
+2025-09-05 12:00:48,052 - INFO - F1: 0.2029, RMSE: 2.9757
+2025-09-05 12:00:48,058 - INFO - 
+--- Iteration 2/180 ---
+2025-09-05 12:00:48,059 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 20, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:00:52,048 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 12:00:52,048 - INFO - No significant improvement (count: 1)
+2025-09-05 12:00:52,077 - INFO - 
+--- Iteration 3/180 ---
+2025-09-05 12:00:52,077 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 30, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:00:55,866 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 12:00:55,866 - INFO - No significant improvement (count: 2)
+2025-09-05 12:00:55,897 - INFO - 
+--- Iteration 4/180 ---
+2025-09-05 12:00:55,898 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 40, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:00:59,689 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 12:00:59,689 - INFO - No significant improvement (count: 3)
+2025-09-05 12:00:59,716 - INFO - 
+--- Iteration 5/180 ---
+2025-09-05 12:00:59,717 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 50, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:01:03,570 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 12:01:03,571 - INFO - No significant improvement (count: 4)
+2025-09-05 12:01:03,599 - INFO - 
+--- Iteration 6/180 ---
+2025-09-05 12:01:03,600 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:01:07,429 - INFO - Performance - F1: 0.2105, RMSE: 2.9757, Composite: 0.4380
+2025-09-05 12:01:07,429 - INFO - No significant improvement (count: 5)
+2025-09-05 12:01:07,460 - INFO - 
+--- Iteration 7/180 ---
+2025-09-05 12:01:07,460 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 20, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:01:11,384 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 12:01:11,384 - INFO - No significant improvement (count: 6)
+2025-09-05 12:01:11,412 - INFO - 
+--- Iteration 8/180 ---
+2025-09-05 12:01:11,413 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 30, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:01:15,219 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 12:01:15,219 - INFO - No significant improvement (count: 7)
+2025-09-05 12:01:15,258 - INFO - 
+--- Iteration 9/180 ---
+2025-09-05 12:01:15,259 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 40, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:01:19,311 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 12:01:19,311 - INFO - No significant improvement (count: 8)
+2025-09-05 12:01:19,340 - INFO - 
+--- Iteration 10/180 ---
+2025-09-05 12:01:19,342 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 50, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:01:23,317 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 12:01:23,318 - INFO - No significant improvement (count: 9)
+2025-09-05 12:01:23,372 - INFO - 
+--- Iteration 11/180 ---
+2025-09-05 12:01:23,373 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 3, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:01:27,130 - INFO - Performance - F1: 0.2201, RMSE: 2.9757, Composite: 0.4163
+2025-09-05 12:01:27,130 - INFO - No significant improvement (count: 10)
+2025-09-05 12:01:27,165 - INFO - No improvement for 10 iterations. Stopping optimization.
+2025-09-05 12:01:27,170 - INFO - 
+================================================================================
+2025-09-05 12:01:27,171 - INFO - OPTIMIZATION COMPLETED
+2025-09-05 12:01:27,171 - INFO - ================================================================================
+2025-09-05 12:01:27,172 - INFO - Total iterations: 11
+2025-09-05 12:01:27,174 - INFO - Total time: 42.90 seconds
+2025-09-05 12:01:27,192 - INFO - Composite Score: 0.4403
+2025-09-05 12:01:27,196 - INFO - F1-Score: 0.2029
+2025-09-05 12:01:27,196 - INFO - Precision: 0.1139
+2025-09-05 12:01:27,198 - INFO - Recall: 1.0000
+2025-09-05 12:01:27,199 - INFO - RMSE: 2.9757
+2025-09-05 12:01:27,199 - INFO - Coverage: 0.8500
+2025-09-05 12:01:27,201 - INFO - Diversity: 0.9879
+2025-09-05 12:01:27,205 - INFO - Best Alpha: 0.0
+2025-09-05 12:01:27,212 - INFO -   content_max_features: 1000
+2025-09-05 12:01:27,212 - INFO -   content_ngram_range: (1, 1)
+2025-09-05 12:01:27,212 - INFO -   content_min_df: 1
+2025-09-05 12:01:27,212 - INFO -   collab_n_factors: 10
+2025-09-05 12:01:27,212 - INFO -   alpha_values: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+2025-09-05 12:16:36,029 - INFO - Starting model optimization...
+2025-09-05 12:16:36,029 - INFO - Generated 180 configuration variations
+2025-09-05 12:16:36,030 - INFO - 
+--- Iteration 1/180 ---
+2025-09-05 12:16:36,030 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:16:42,151 - INFO - Performance - F1: 0.2029, RMSE: 2.9757, Composite: 0.4403
+2025-09-05 12:16:42,151 - INFO - NEW BEST PERFORMANCE! Composite Score: 0.4403
+2025-09-05 12:16:42,151 - INFO - Best Alpha: 0.0
+2025-09-05 12:16:42,152 - INFO - F1: 0.2029, RMSE: 2.9757
+2025-09-05 12:16:42,168 - INFO - 
+--- Iteration 2/180 ---
+2025-09-05 12:16:42,170 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 20, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:16:47,947 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 12:16:47,948 - INFO - No significant improvement (count: 1)
+2025-09-05 12:16:47,999 - INFO - 
+--- Iteration 3/180 ---
+2025-09-05 12:16:48,000 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 30, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:16:53,639 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 12:16:53,639 - INFO - No significant improvement (count: 2)
+2025-09-05 12:16:53,679 - INFO - 
+--- Iteration 4/180 ---
+2025-09-05 12:16:53,679 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 40, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:16:59,431 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 12:16:59,431 - INFO - No significant improvement (count: 3)
+2025-09-05 12:16:59,471 - INFO - 
+--- Iteration 5/180 ---
+2025-09-05 12:16:59,473 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 1, 'collab_n_factors': 50, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:17:05,105 - INFO - Performance - F1: 0.2029, RMSE: 3.2692, Composite: 0.4286
+2025-09-05 12:17:05,105 - INFO - No significant improvement (count: 4)
+2025-09-05 12:17:05,150 - INFO - 
+--- Iteration 6/180 ---
+2025-09-05 12:17:05,153 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:17:10,592 - INFO - Performance - F1: 0.2105, RMSE: 2.9757, Composite: 0.4380
+2025-09-05 12:17:10,593 - INFO - No significant improvement (count: 5)
+2025-09-05 12:17:10,668 - INFO - 
+--- Iteration 7/180 ---
+2025-09-05 12:17:10,674 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 20, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:17:15,156 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 12:17:15,156 - INFO - No significant improvement (count: 6)
+2025-09-05 12:17:15,191 - INFO - 
+--- Iteration 8/180 ---
+2025-09-05 12:17:15,191 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 30, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:17:19,327 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 12:17:19,327 - INFO - No significant improvement (count: 7)
+2025-09-05 12:17:19,362 - INFO - 
+--- Iteration 9/180 ---
+2025-09-05 12:17:19,363 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 40, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:17:23,048 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 12:17:23,048 - INFO - No significant improvement (count: 8)
+2025-09-05 12:17:23,076 - INFO - 
+--- Iteration 10/180 ---
+2025-09-05 12:17:23,077 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 2, 'collab_n_factors': 50, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:17:26,581 - INFO - Performance - F1: 0.2105, RMSE: 3.2692, Composite: 0.4263
+2025-09-05 12:17:26,582 - INFO - No significant improvement (count: 9)
+2025-09-05 12:17:26,614 - INFO - 
+--- Iteration 11/180 ---
+2025-09-05 12:17:26,614 - INFO - Training with config: {'content_max_features': 1000, 'content_ngram_range': (1, 1), 'content_min_df': 3, 'collab_n_factors': 10, 'alpha_values': [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+2025-09-05 12:17:30,412 - INFO - Performance - F1: 0.2201, RMSE: 2.9757, Composite: 0.4163
+2025-09-05 12:17:30,413 - INFO - No significant improvement (count: 10)
+2025-09-05 12:17:30,447 - INFO - No improvement for 10 iterations. Stopping optimization.
+2025-09-05 12:17:30,447 - INFO - 
+================================================================================
+2025-09-05 12:17:30,447 - INFO - OPTIMIZATION COMPLETED
+2025-09-05 12:17:30,447 - INFO - ================================================================================
+2025-09-05 12:17:30,448 - INFO - Total iterations: 11
+2025-09-05 12:17:30,448 - INFO - Total time: 54.42 seconds
+2025-09-05 12:17:30,452 - INFO - Composite Score: 0.4403
+2025-09-05 12:17:30,452 - INFO - F1-Score: 0.2029
+2025-09-05 12:17:30,452 - INFO - Precision: 0.1139
+2025-09-05 12:17:30,453 - INFO - Recall: 1.0000
+2025-09-05 12:17:30,453 - INFO - RMSE: 2.9757
+2025-09-05 12:17:30,453 - INFO - Coverage: 0.8500
+2025-09-05 12:17:30,453 - INFO - Diversity: 0.9879
+2025-09-05 12:17:30,453 - INFO - Best Alpha: 0.0
+2025-09-05 12:17:30,456 - INFO -   content_max_features: 1000
+2025-09-05 12:17:30,456 - INFO -   content_ngram_range: (1, 1)
+2025-09-05 12:17:30,456 - INFO -   content_min_df: 1
+2025-09-05 12:17:30,456 - INFO -   collab_n_factors: 10
+2025-09-05 12:17:30,456 - INFO -   alpha_values: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]

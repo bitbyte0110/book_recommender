@@ -12,26 +12,61 @@ def show_search_ui(books_df):
     Returns:
         tuple: (selected_book, alpha_weight, selected_genres, num_recommendations)
     """
-    st.header("📚 Find Your Next Great Read")
+    # Modern search section with glassmorphism effect
+    st.markdown("""
+    <div style='background: rgba(255, 255, 255, 0.9); 
+                backdrop-filter: blur(10px); 
+                border-radius: 16px; 
+                padding: 1.5rem; 
+                margin-bottom: 2rem;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100px;'>
+        <h2 style='text-align: center; 
+                   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                   -webkit-background-clip: text; 
+                   -webkit-text-fill-color: transparent; 
+                   background-clip: text; 
+                   margin: 0;
+                   font-size: 2rem;
+                   font-weight: 700;'>📚 Find Your Next Great Read</h2>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Create two columns for layout
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.subheader("🔍 Search & Select")
+        # Modern search section
+        st.markdown("""
+        <div style='background: rgba(255, 255, 255, 0.9); 
+                    backdrop-filter: blur(10px); 
+                    border-radius: 16px; 
+                    padding: 1.5rem; 
+                    margin-bottom: 1rem;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);'>
+            <h3 style='color: #374151; margin-bottom: 1rem; font-weight: 600;'>🔍 Search & Select</h3>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # Search functionality
+        # Search functionality with modern styling
         search_term = st.text_input(
-            "Search books by title or author:",
-            placeholder="Enter book title or author name..."
+            "🔎 Search books by title or author:",
+            placeholder="Enter book title or author name...",
+            help="Type to search through our book database"
         )
         
-        # Filter by publisher
+        # Filter by publisher with modern styling
         all_publishers = get_genres(books_df)  # This now returns publishers
         selected_publishers = st.multiselect(
-            "Filter by publisher (optional):",
+            "📚 Filter by publisher (optional):",
             options=all_publishers,
-            default=[]
+            default=[],
+            help="Select publishers to narrow down your search"
         )
         
         # Filter books based on search and publisher
@@ -41,10 +76,20 @@ def show_search_ui(books_df):
         if selected_publishers:
             filtered_books = filter_books_by_genre(filtered_books, selected_publishers)  # Function name unchanged but filters by publisher
         
-        # Display filtered books count
-        st.info(f"Found {len(filtered_books)} books matching your criteria")
+        # Display filtered books count with modern styling
+        st.markdown(f"""
+        <div style='background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
+                    color: white; 
+                    padding: 1rem; 
+                    border-radius: 12px; 
+                    text-align: center; 
+                    margin: 1rem 0;
+                    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);'>
+            <strong>📊 Found {len(filtered_books)} books matching your criteria</strong>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # Book selection
+        # Book selection with modern styling
         if len(filtered_books) > 0:
             # Create a more user-friendly display for book selection
             book_options = []
@@ -53,9 +98,10 @@ def show_search_ui(books_df):
                 book_options.append((display_text, book['title']))
             
             selected_display = st.selectbox(
-                "Choose a book to get recommendations:",
+                "📖 Choose a book to get recommendations:",
                 options=[opt[0] for opt in book_options],
-                index=0 if book_options else None
+                index=0 if book_options else None,
+                help="Select a book to discover similar recommendations"
             )
             
             # Extract the actual book title
@@ -70,11 +116,31 @@ def show_search_ui(books_df):
             st.warning("No books found matching your criteria. Try adjusting your search or genre filters.")
     
     with col2:
-        st.subheader("⚙️ Settings")
+        # Modern settings panel
+        st.markdown("""
+        <div style='background: rgba(255, 255, 255, 0.9); 
+                    backdrop-filter: blur(10px); 
+                    border-radius: 16px; 
+                    padding: 1.5rem; 
+                    margin-bottom: 1rem;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);'>
+            <h3 style='color: #374151; margin-bottom: 1rem; font-weight: 600;'>⚙️ Settings</h3>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # Hybrid weight adjustment
-        st.write("**Hybrid Weight Adjustment**")
-        st.write("Adjust the balance between content-based and collaborative filtering:")
+        # Hybrid weight adjustment with modern styling
+        st.markdown("""
+        <div style='background: rgba(255, 255, 255, 0.9); 
+                    border-radius: 16px; 
+                    padding: 1.5rem; 
+                    margin-bottom: 1rem;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);'>
+            <h4 style='color: #374151; margin-bottom: 0.5rem; font-weight: 600;'>🎛️ Hybrid Weight Adjustment</h4>
+            <p style='color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem;'>Adjust the balance between content-based and collaborative filtering</p>
+        </div>
+        """, unsafe_allow_html=True)
         
         alpha = st.slider(
             "Content vs Collaborative Weight",
@@ -85,26 +151,79 @@ def show_search_ui(books_df):
             help="0.0 = Pure collaborative filtering, 1.0 = Pure content-based filtering"
         )
         
-        # Display weight explanation
+        # Display weight explanation with modern styling
         if alpha == 0.0:
-            st.info("🎯 **Pure Collaborative Filtering**: Recommendations based on what similar users liked")
+            st.markdown("""
+            <div style='background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
+                        color: white; 
+                        padding: 1rem; 
+                        border-radius: 12px; 
+                        margin: 1rem 0;
+                        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);'>
+                <strong>🎯 Pure Collaborative Filtering</strong><br>
+                Recommendations based on what similar users liked
+            </div>
+            """, unsafe_allow_html=True)
         elif alpha == 1.0:
-            st.info("📖 **Pure Content-Based Filtering**: Recommendations based on book content similarity")
+            st.markdown("""
+            <div style='background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+                        color: white; 
+                        padding: 1rem; 
+                        border-radius: 12px; 
+                        margin: 1rem 0;
+                        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);'>
+                <strong>📖 Pure Content-Based Filtering</strong><br>
+                Recommendations based on book content similarity
+            </div>
+            """, unsafe_allow_html=True)
         else:
-            st.info(f"🔄 **Hybrid Approach**: {alpha*100:.0f}% content-based + {(1-alpha)*100:.0f}% collaborative")
+            st.markdown(f"""
+            <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        padding: 1rem; 
+                        border-radius: 12px; 
+                        margin: 1rem 0;
+                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);'>
+                <strong>🔄 Hybrid Approach</strong><br>
+                {alpha*100:.0f}% content-based + {(1-alpha)*100:.0f}% collaborative
+            </div>
+            """, unsafe_allow_html=True)
         
-        # Number of recommendations
+        # Number of recommendations with modern styling
+        st.markdown("""
+        <div style='background: rgba(255, 255, 255, 0.9); 
+                    border-radius: 16px; 
+                    padding: 1.5rem; 
+                    margin-bottom: 1rem;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);'>
+            <h4 style='color: #374151; margin-bottom: 0.5rem; font-weight: 600;'>📊 Number of Recommendations</h4>
+        </div>
+        """, unsafe_allow_html=True)
+        
         num_recommendations = st.slider(
-            "Number of recommendations:",
+            "How many recommendations would you like?",
             min_value=5,
             max_value=20,
             value=10,
-            step=1
+            step=1,
+            help="Choose between 5-20 recommendations"
         )
         
-        # Show selected book info if available
+        # Show selected book info if available with modern styling
         if selected_book:
-            st.subheader("📖 Selected Book")
+            st.markdown("""
+            <div style='background: rgba(255, 255, 255, 0.8); 
+                        backdrop-filter: blur(10px); 
+                        border-radius: 16px; 
+                        padding: 1.5rem; 
+                        margin-top: 1rem;
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);'>
+                <h3 style='color: #374151; margin-bottom: 1rem; font-weight: 600;'>📖 Selected Book</h3>
+            </div>
+            """, unsafe_allow_html=True)
+            
             import re
             escaped_title = re.escape(selected_book)
             matches = books_df[books_df['title'].str.contains(escaped_title, regex=True, na=False)]
@@ -120,14 +239,56 @@ def show_search_ui(books_df):
             
             book_info = matches.iloc[0]
             
-            st.write(f"**Title:** {book_info['title']}")
-            st.write(f"**Author:** {book_info['authors']}")
-            st.write(f"**Publisher:** {book_info['publisher']}")
+            # Modern book info display
+            st.markdown(f"""
+            <div style='background: rgba(255, 255, 255, 0.9); 
+                        border-radius: 16px; 
+                        padding: 1.5rem; 
+                        margin: 1rem 0;
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);'>
+                <div style='margin-bottom: 0.5rem;'>
+                    <strong style='color: #374151;'>📚 Title:</strong> 
+                    <span style='color: #1f2937; font-weight: 500;'>{book_info['title']}</span>
+                </div>
+                <div style='margin-bottom: 0.5rem;'>
+                    <strong style='color: #374151;'>✍️ Author:</strong> 
+                    <span style='color: #1f2937; font-weight: 500;'>{book_info['authors']}</span>
+                </div>
+                <div style='margin-bottom: 0.5rem;'>
+                    <strong style='color: #374151;'>🏢 Publisher:</strong> 
+                    <span style='color: #1f2937; font-weight: 500;'>{book_info['publisher']}</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
             if 'average_rating' in book_info and book_info['average_rating'] > 0:
-                st.write(f"**Rating:** {book_info['average_rating']:.1f} ⭐")
-            if 'description' in book_info:
-                with st.expander("📝 Description"):
+                st.markdown(f"""
+                <div style='background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); 
+                            color: white; 
+                            padding: 0.75rem 1rem; 
+                            border-radius: 12px; 
+                            text-align: center;
+                            margin: 1rem 0;
+                            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);'>
+                    <strong>⭐ Rating: {book_info['average_rating']:.1f}/5.0</strong>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            if 'description' in book_info and book_info['description'] and book_info['description'] != 'No description available':
+                with st.expander("📝 Book Description", expanded=False):
                     st.write(book_info['description'])
+            elif 'description' in book_info and book_info['description'] == 'No description available':
+                st.markdown("""
+                <div style='background: rgba(107, 114, 128, 0.1); 
+                            color: #6b7280; 
+                            padding: 1rem; 
+                            border-radius: 12px; 
+                            text-align: center;
+                            margin: 1rem 0;'>
+                    📝 No description available for this book
+                </div>
+                """, unsafe_allow_html=True)
     
     return selected_book, alpha, selected_publishers, num_recommendations
 
@@ -225,7 +386,19 @@ def show_recommendation_controls():
     Returns:
         bool: Whether to generate recommendations
     """
-    st.markdown("---")
+    st.markdown("""
+    <div style='margin: 3rem 0; text-align: center;'>
+        <div style='background: rgba(255, 255, 255, 0.9); 
+                    backdrop-filter: blur(10px); 
+                    border-radius: 16px; 
+                    padding: 1.5rem; 
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);'>
+            <h3 style='color: #374151; margin-bottom: 1rem; font-weight: 600;'>Ready to discover your next favorite book?</h3>
+            <p style='color: #6b7280; margin-bottom: 2rem;'>Click the button below to generate personalized recommendations</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
@@ -233,7 +406,8 @@ def show_recommendation_controls():
         generate_button = st.button(
             "🚀 Generate Recommendations",
             type="primary",
-            use_container_width=True
+            use_container_width=True,
+            help="Generate personalized book recommendations based on your selection"
         )
     
     return generate_button

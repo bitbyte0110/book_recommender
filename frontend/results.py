@@ -58,38 +58,61 @@ def display_recommendation_cards(recommendations, show_detailed_scores=False):
     for i, rec in enumerate(recommendations):
         col_idx = i % 2
         with cols[col_idx]:
+            # Create a modern card using Streamlit components
             with st.container():
-                st.markdown("---")
+                # Card header with title and score
+                col_title, col_score = st.columns([3, 1])
                 
-                # Book title and author
-                st.markdown(f"### {rec['title']}")
-                st.markdown(f"**by {rec['authors']}**")
+                with col_title:
+                    st.markdown(f"### {rec['title']}")
+                    st.markdown(f"**by {rec['authors']}**")
                 
-                # Genre badge
-                st.markdown(f"<span style='background-color: #e1f5fe; padding: 2px 8px; border-radius: 12px; font-size: 0.8em;'>{rec['genre']}</span>", unsafe_allow_html=True)
+                with col_score:
+                    score_key = 'hybrid_score' if 'hybrid_score' in rec else 'similarity_score'
+                    score_value = rec.get(score_key, 0)
+                    st.metric("Score", f"{format_similarity_score(score_value)}")
                 
-                # Rating
-                if rec.get('rating', 0) > 0:
-                    st.write(f"📖 Rating: {format_rating(rec['rating'])}")
+                # Genre and rating badges
+                col_genre, col_rating = st.columns(2)
                 
-                # Similarity score
-                if 'hybrid_score' in rec:
-                    score_color = get_score_color(rec['hybrid_score'])
-                    st.markdown(f"🎯 **Similarity Score:** <span style='color: {score_color};'>{format_similarity_score(rec['hybrid_score'])}</span>", unsafe_allow_html=True)
+                with col_genre:
+                    st.markdown(f"**Publisher:** {rec['genre']}")
+                
+                with col_rating:
+                    if rec.get("rating", 0) > 0:
+                        st.markdown(f"**Rating:** ⭐ {rec['rating']:.1f}")
+                    else:
+                        st.markdown("**Rating:** N/A")
+                
+                # Method indicator
+                method = rec.get('method', 'hybrid')
+                method_emojis = {
+                    'hybrid': '🔄',
+                    'content_based': '📖',
+                    'collaborative': '👥'
+                }
+                method_labels = {
+                    'hybrid': 'Hybrid',
+                    'content_based': 'Content-Based',
+                    'collaborative': 'Collaborative'
+                }
+                
+                emoji = method_emojis.get(method, '📖')
+                label = method_labels.get(method, method.replace('_', ' ').title())
+                
+                st.markdown(f"**Method:** {emoji} {label}")
+                st.markdown(f"**Rank:** #{i+1}")
                 
                 # Detailed scores if requested
                 if show_detailed_scores and 'content_score' in rec and 'collab_score' in rec:
-                    with st.expander("📊 Detailed Scores"):
+                    with st.expander("📊 Detailed Scores", expanded=False):
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.write(f"Content: {format_similarity_score(rec['content_score'])}")
+                            st.metric("Content Score", f"{format_similarity_score(rec['content_score'])}")
                         with col2:
-                            st.write(f"Collaborative: {format_similarity_score(rec['collab_score'])}")
+                            st.metric("Collaborative Score", f"{format_similarity_score(rec['collab_score'])}")
                 
-                # Method indicator
-                if 'method' in rec:
-                    method_emoji = "🔄" if rec['method'] == 'hybrid' else "📖"
-                    st.markdown(f"<small>{method_emoji} {rec['method'].replace('_', ' ').title()}</small>", unsafe_allow_html=True)
+                st.markdown("---")
 
 def display_recommendation_analysis(recommendations):
     """
@@ -258,13 +281,57 @@ def get_score_color(score):
         color: Hex color code
     """
     if score >= 0.8:
-        return "#28a745"  # Green
+        return "#10b981"  # Green
     elif score >= 0.6:
-        return "#ffc107"  # Yellow
+        return "#f59e0b"  # Yellow
     elif score >= 0.4:
-        return "#fd7e14"  # Orange
+        return "#f97316"  # Orange
     else:
-        return "#dc3545"  # Red
+        return "#ef4444"  # Red
+
+def get_method_indicator(method):
+    """
+    Get method indicator with emoji and styling.
+    
+    Args:
+        method: Recommendation method
+    
+    Returns:
+        HTML string with method indicator
+    """
+    method_emojis = {
+        'hybrid': '🔄',
+        'content_based': '📖',
+        'collaborative': '👥'
+    }
+    method_labels = {
+        'hybrid': 'Hybrid',
+        'content_based': 'Content-Based',
+        'collaborative': 'Collaborative'
+    }
+    method_colors = {
+        'hybrid': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'content_based': 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        'collaborative': 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+    }
+    
+    emoji = method_emojis.get(method, '📖')
+    label = method_labels.get(method, method.replace('_', ' ').title())
+    color = method_colors.get(method, 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)')
+    
+    return f"""
+    <span style='background: {color}; 
+                 color: white; 
+                 padding: 0.25rem 0.75rem; 
+                 border-radius: 20px; 
+                 font-size: 0.8rem; 
+                 font-weight: 500;
+                 display: inline-flex;
+                 align-items: center;
+                 gap: 0.25rem;'>
+        {emoji} {label}
+    </span>
+    """
 
 def display_error_message(error_msg):
     """

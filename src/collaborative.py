@@ -83,7 +83,8 @@ def get_collaborative_recommendations(book_title, books_df, item_similarity_matr
                 'authors': books_df.iloc[idx]['authors'],
                 'genre': books_df.iloc[idx].get('publisher', 'Unknown'),
                 'similarity_score': book_similarities[idx],
-                'rating': books_df.iloc[idx].get('average_rating', 0)
+                'rating': books_df.iloc[idx].get('average_rating', 0),
+                'method': 'collaborative'
             })
         
         return recommendations

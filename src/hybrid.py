@@ -3,6 +3,48 @@ import numpy as np
 from .content_based import get_content_based_recommendations
 from .collaborative import get_collaborative_recommendations
 
+def get_method_label(alpha, collab_data_available, matrices_match):
+    """
+    Determine the correct method label based on alpha value and data availability.
+    
+    Args:
+        alpha: Weight for content-based filtering (0 = pure collaborative, 1 = pure content)
+        collab_data_available: Whether collaborative filtering data is available
+        matrices_match: Whether content and collaborative matrices have matching shapes
+    
+    Returns:
+        method_label: String indicating the recommendation method used
+    """
+    if not collab_data_available or not matrices_match:
+        return 'content_based'
+    elif alpha == 1.0:
+        return 'content_based'
+    elif alpha == 0.0:
+        return 'collaborative'
+    else:
+        return 'hybrid'
+
+def get_actual_method(alpha, is_hybrid, collab_data_available):
+    """
+    Determine the actual method being used based on alpha value and data availability.
+    
+    Args:
+        alpha: Weight for content-based filtering (0 = pure collaborative, 1 = pure content)
+        is_hybrid: Whether hybrid scoring is being used
+        collab_data_available: Whether collaborative filtering data is available
+    
+    Returns:
+        method_label: String indicating the actual recommendation method used
+    """
+    if not collab_data_available:
+        return 'content_based'
+    elif alpha == 0.0:
+        return 'collaborative'
+    elif alpha == 1.0:
+        return 'content_based'
+    else:
+        return 'hybrid'
+
 def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix, 
                     alpha=0.6, top_n=10, fallback_to_content=True):
     """
@@ -42,9 +84,10 @@ def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix
         # Initialize variables
         collab_data_available = False
         collab_scores = np.zeros_like(content_scores)
+        is_hybrid = False
         
         # Check if collaborative filtering matrix has the same shape
-        if collab_sim_matrix.shape[0] == content_sim_matrix.shape[0]:
+        if collab_sim_matrix is not None and collab_sim_matrix.shape[0] == content_sim_matrix.shape[0]:
             # Get collaborative scores
             collab_scores = collab_sim_matrix[book_idx]
             
@@ -58,6 +101,14 @@ def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix
                 
                 # Calculate hybrid scores
                 hybrid_scores = alpha * content_scores_norm + (1 - alpha) * collab_scores_norm
+                
+                # Determine the actual method based on alpha value
+                if alpha == 0.0:
+                    is_hybrid = False  # Pure collaborative
+                elif alpha == 1.0:
+                    is_hybrid = False  # Pure content-based
+                else:
+                    is_hybrid = True   # True hybrid
             else:
                 # Fall back to content-based only
                 if fallback_to_content:
@@ -65,7 +116,7 @@ def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix
                 else:
                     return []
         else:
-            # Collaborative matrix has different shape, use content-based only
+            # Collaborative matrix has different shape or doesn't exist, use content-based only
             if fallback_to_content:
                 hybrid_scores = content_scores
             else:
@@ -86,7 +137,7 @@ def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix
                 'content_score': content_scores[idx],
                 'collab_score': collab_scores[idx] if collab_data_available else 0,
                 'rating': books_df.iloc[idx].get('average_rating', 0),
-                'method': 'hybrid' if collab_data_available and collab_sim_matrix.shape[0] == content_sim_matrix.shape[0] else 'content_only'
+                'method': get_actual_method(alpha, is_hybrid, collab_data_available)
             })
         
         return recommendations

@@ -47,28 +47,19 @@ def save_sim_matrix(similarity_matrix: np.ndarray, matrix_type: str) -> None:
 def load_books_data() -> pd.DataFrame:
     """
     Load cleaned books data.
-    Only loads books that have ratings to match similarity matrices.
     
     Returns:
         books_df: DataFrame with book information
     """
     try:
-        # Load ratings to get books that have ratings
-        ratings_df = pd.read_csv('data/processed/ratings.csv')
-        books_with_ratings = ratings_df['book_id'].unique()
-        
         filepath = 'data/processed/books_clean.csv'
         if os.path.exists(filepath):
             books_df = pd.read_csv(filepath)
-            # Filter to only include books with ratings
-            books_df = books_df[books_df['book_id'].isin(books_with_ratings)].copy()
             return books_df
         else:
             # If no processed data exists, load and clean raw data
             from .data_processing import load_and_clean_data
             books_df = load_and_clean_data()
-            # Filter to only include books with ratings
-            books_df = books_df[books_df['book_id'].isin(books_with_ratings)].copy()
             return books_df
     except Exception as e:
         print(f"Error loading books data: {e}")
