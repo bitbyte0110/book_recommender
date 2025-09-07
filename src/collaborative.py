@@ -26,7 +26,7 @@ def create_user_item_matrix(ratings_df, books_df):
 
 def create_item_item_similarity_matrix(user_item_matrix):
     """
-    Create item-item similarity matrix using cosine similarity.
+    Create item-item similarity matrix using advanced ALS with regularization.
     
     Args:
         user_item_matrix: User-item rating matrix
@@ -34,9 +34,164 @@ def create_item_item_similarity_matrix(user_item_matrix):
     Returns:
         item_similarity_matrix: Item-item similarity matrix
     """
-    # Calculate item-item similarity using cosine similarity
-    item_similarity_matrix = cosine_similarity(user_item_matrix.T)
+    print("Creating item-item similarity matrix using advanced ALS...")
     
+    # Implement ALS (Alternating Least Squares) with regularization
+    class ALSRecommender:
+        def __init__(self, n_factors=20, regularization=0.1, iterations=50, random_state=42):
+            self.n_factors = n_factors
+            self.regularization = regularization
+            self.iterations = iterations
+            self.random_state = random_state
+            self.user_factors = None
+            self.item_factors = None
+            
+        def fit(self, user_item_matrix):
+            """Fit ALS model to user-item matrix"""
+            np.random.seed(self.random_state)
+            
+            n_users, n_items = user_item_matrix.shape
+            
+            # Initialize factors randomly
+            self.user_factors = np.random.normal(0, 0.1, (n_users, self.n_factors))
+            self.item_factors = np.random.normal(0, 0.1, (n_items, self.n_factors))
+            
+            # Convert to sparse matrix for efficiency
+            from scipy.sparse import csr_matrix
+            sparse_matrix = csr_matrix(user_item_matrix.values)
+            
+            # ALS iterations
+            for iteration in range(self.iterations):
+                # Update user factors
+                for u in range(n_users):
+                    # Get items rated by user u
+                    user_ratings = sparse_matrix[u].toarray().flatten()
+                    rated_items = np.where(user_ratings > 0)[0]
+                    
+                    if len(rated_items) > 0:
+                        # Solve: (item_factors^T * item_factors + λI) * user_factors[u] = item_factors^T * ratings
+                        item_subset = self.item_factors[rated_items]
+                        ratings_subset = user_ratings[rated_items]
+                        
+                        # Regularized least squares
+                        A = item_subset.T @ item_subset + self.regularization * np.eye(self.n_factors)
+                        b = item_subset.T @ ratings_subset
+                        
+                        try:
+                            self.user_factors[u] = np.linalg.solve(A, b)
+                        except np.linalg.LinAlgError:
+                            # Fallback to pseudo-inverse
+                            self.user_factors[u] = np.linalg.pinv(A) @ b
+                
+                # Update item factors
+                for i in range(n_items):
+                    # Get users who rated item i
+                    item_ratings = sparse_matrix[:, i].toarray().flatten()
+                    rating_users = np.where(item_ratings > 0)[0]
+                    
+                    if len(rating_users) > 0:
+                        # Solve: (user_factors^T * user_factors + λI) * item_factors[i] = user_factors^T * ratings
+                        user_subset = self.user_factors[rating_users]
+                        ratings_subset = item_ratings[rating_users]
+                        
+                        # Regularized least squares
+                        A = user_subset.T @ user_subset + self.regularization * np.eye(self.n_factors)
+                        b = user_subset.T @ ratings_subset
+                        
+                        try:
+                            self.item_factors[i] = np.linalg.solve(A, b)
+                        except np.linalg.LinAlgError:
+                            # Fallback to pseudo-inverse
+                            self.item_factors[i] = np.linalg.pinv(A) @ b
+                
+                if iteration % 10 == 0:
+                    print(f"ALS iteration {iteration}/{self.iterations}")
+            
+            print(f"ALS training completed with {self.n_factors} factors")
+            
+        def predict(self, user_item_matrix):
+            """Predict ratings using learned factors"""
+            return self.user_factors @ self.item_factors.T
+            
+        def get_item_factors(self):
+            """Get item factors for similarity calculation"""
+            return self.item_factors
+    
+    # Use ALS with optimized parameters
+    als_model = ALSRecommender(
+        n_factors=min(20, user_item_matrix.shape[1] - 1, user_item_matrix.shape[0] - 1),
+        regularization=0.1,
+        iterations=100,
+        random_state=42
+    )
+    
+    try:
+        als_model.fit(user_item_matrix)
+        item_factors = als_model.get_item_factors()
+        
+        # Calculate item-item similarity using cosine similarity on factors
+        item_similarity_matrix = cosine_similarity(item_factors)
+        
+        # Save the ALS model for later use
+        import joblib
+        os.makedirs('models', exist_ok=True)
+        joblib.dump(als_model, 'models/als_model.pkl')
+        
+        print(f"ALS model saved with {als_model.n_factors} factors")
+        
+    except Exception as e:
+        print(f"ALS failed, falling back to enhanced SVD: {e}")
+        # Enhanced SVD with bias terms
+        from sklearn.decomposition import TruncatedSVD
+        
+        # Calculate global bias
+        global_bias = user_item_matrix.values[user_item_matrix.values > 0].mean()
+        
+        # Calculate user and item biases
+        user_bias = {}
+        item_bias = {}
+        
+        for i, user_id in enumerate(user_item_matrix.index):
+            user_ratings = user_item_matrix.iloc[i].values
+            rated_items = user_ratings[user_ratings > 0]
+            if len(rated_items) > 0:
+                user_bias[user_id] = rated_items.mean() - global_bias
+            else:
+                user_bias[user_id] = 0
+        
+        for j, item_id in enumerate(user_item_matrix.columns):
+            item_ratings = user_item_matrix.iloc[:, j].values
+            rated_by_users = item_ratings[item_ratings > 0]
+            if len(rated_by_users) > 0:
+                item_bias[item_id] = rated_by_users.mean() - global_bias
+            else:
+                item_bias[item_id] = 0
+        
+        # Apply bias correction
+        bias_corrected_matrix = user_item_matrix.copy()
+        for i, user_id in enumerate(user_item_matrix.index):
+            for j, item_id in enumerate(user_item_matrix.columns):
+                if user_item_matrix.iloc[i, j] > 0:
+                    bias_corrected_matrix.iloc[i, j] = user_item_matrix.iloc[i, j] - user_bias[user_id] - item_bias[item_id]
+        
+        # Fit SVD on bias-corrected matrix
+        n_components = min(20, user_item_matrix.shape[1] - 1, user_item_matrix.shape[0] - 1)
+        svd = TruncatedSVD(n_components=n_components, random_state=42, algorithm='arpack')
+        svd.fit(bias_corrected_matrix)
+        item_factors = svd.components_.T
+        item_similarity_matrix = cosine_similarity(item_factors)
+        
+        # Save enhanced model with bias terms
+        enhanced_model = {
+            'svd': svd,
+            'global_bias': global_bias,
+            'user_bias': user_bias,
+            'item_bias': item_bias
+        }
+        joblib.dump(enhanced_model, 'models/enhanced_svd_model.pkl')
+        print("Enhanced SVD model with bias terms saved")
+    
+    print(f"Item-item similarity matrix shape: {item_similarity_matrix.shape}")
     return item_similarity_matrix
 
 def get_collaborative_recommendations(book_title, books_df, item_similarity_matrix, top_n=10):

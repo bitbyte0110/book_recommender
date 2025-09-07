@@ -15,15 +15,18 @@ def create_content_similarity_matrix(books_df):
         similarity_matrix: Cosine similarity matrix
         tfidf_matrix: TF-IDF matrix for later use
     """
-    # Initialize TF-IDF vectorizer with better parameters for small dataset
+    # Initialize advanced TF-IDF vectorizer with optimized parameters for F1-score
     tfidf = TfidfVectorizer(
         stop_words='english',
-        max_features=1000,  # Reduced for small dataset
+        max_features=5000,  # Increased for better feature coverage
         ngram_range=(1, 3),  # Include trigrams for better matching
-        min_df=1,  # Allow all terms
-        max_df=0.95,  # Allow more common terms
+        min_df=1,  # Allow more terms for better recall
+        max_df=0.7,  # Filter very common terms
         sublinear_tf=True,  # Use sublinear TF scaling
-        norm='l2'  # L2 normalization
+        norm='l2',  # L2 normalization
+        lowercase=True,
+        strip_accents='unicode',
+        analyzer='word'  # Word-level analysis
     )
     
     # Fit and transform the combined features
