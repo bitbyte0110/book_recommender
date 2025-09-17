@@ -325,7 +325,7 @@ class RecommenderEvaluator:
         sorted_books = sorted(predictions.items(), key=lambda x: x[1], reverse=True)
         return [book_id for book_id, _ in sorted_books[:top_n]]
     
-    def evaluate_collaborative_filtering(self, ratings_df, model, top_n=10, threshold=3.0, test_size=0.2):
+    def evaluate_collaborative_filtering(self, ratings_df, model, content_sim_matrix, top_n=10, threshold=3.0, test_size=0.2):
         """
         Evaluate collaborative filtering system with proper, honest evaluation
         Returns: precision, recall, f1, mse, rmse
@@ -457,12 +457,18 @@ class RecommenderEvaluator:
                     mse_scores.append(user_mse)
                     rmse_scores.append(user_rmse)
         
+        # Calculate coverage and diversity for collaborative filtering
+        coverage_result = self.calculate_coverage(ratings_df, content_sim_matrix, top_n, n_users=100)
+        diversity_result = self.calculate_diversity(ratings_df, content_sim_matrix, top_n, n_users=100)
+        
         return {
             'precision': np.mean(precision_scores) if precision_scores else 0,
             'recall': np.mean(recall_scores) if recall_scores else 0,
             'f1': np.mean(f1_scores) if f1_scores else 0,
             'mse': np.mean(mse_scores) if mse_scores else 1.0,
             'rmse': np.mean(rmse_scores) if rmse_scores else 1.0,
+            'coverage': coverage_result['coverage'],
+            'diversity': diversity_result['diversity'],
             'n_users_evaluated': len(precision_scores)
         }
     
@@ -560,12 +566,18 @@ class RecommenderEvaluator:
                 mse_scores.append(user_mse)
                 rmse_scores.append(user_rmse)
         
+        # Calculate coverage and diversity for content-based filtering
+        coverage_result = self.calculate_coverage(ratings_df, content_sim_matrix, top_n, n_users=100)
+        diversity_result = self.calculate_diversity(ratings_df, content_sim_matrix, top_n, n_users=100)
+        
         return {
             'precision': np.mean(precision_scores) if precision_scores else 0,
             'recall': np.mean(recall_scores) if recall_scores else 0,
             'f1': np.mean(f1_scores) if f1_scores else 0,
             'mse': np.mean(mse_scores) if mse_scores else 1.0,
             'rmse': np.mean(rmse_scores) if rmse_scores else 1.0,
+            'coverage': coverage_result['coverage'],
+            'diversity': diversity_result['diversity'],
             'n_users_evaluated': len(precision_scores)
         }
     
@@ -718,12 +730,18 @@ class RecommenderEvaluator:
                 mse_scores.append(user_mse)
                 rmse_scores.append(user_rmse)
         
+        # Calculate coverage and diversity for hybrid filtering
+        coverage_result = self.calculate_coverage(ratings_df, content_sim_matrix, top_n, n_users=100)
+        diversity_result = self.calculate_diversity(ratings_df, content_sim_matrix, top_n, n_users=100)
+        
         return {
             'precision': np.mean(precision_scores) if precision_scores else 0,
             'recall': np.mean(recall_scores) if recall_scores else 0,
             'f1': np.mean(f1_scores) if f1_scores else 0,
             'mse': np.mean(mse_scores) if mse_scores else 1.0,
             'rmse': np.mean(rmse_scores) if rmse_scores else 1.0,
+            'coverage': coverage_result['coverage'],
+            'diversity': diversity_result['diversity'],
             'n_users_evaluated': len(precision_scores)
         }
     
@@ -1249,7 +1267,7 @@ class RecommenderEvaluator:
         print("\n" + "="*60)
         print("EVALUATING COLLABORATIVE FILTERING")
         print("="*60)
-        collab_results = self.evaluate_collaborative_filtering(ratings_df, model, top_n, threshold, test_size)
+        collab_results = self.evaluate_collaborative_filtering(ratings_df, model, content_sim_matrix, top_n, threshold, test_size)
         
         print("\n" + "="*60)
         print("EVALUATING CONTENT-BASED FILTERING")
@@ -1309,7 +1327,9 @@ class RecommenderEvaluator:
                     'recall': self._find_best_system_by_metric(results, 'recall'),
                     'f1': self._find_best_system_by_metric(results, 'f1'),
                     'mse': self._find_best_system_by_metric(results, 'mse', lower_is_better=True),
-                    'rmse': self._find_best_system_by_metric(results, 'rmse', lower_is_better=True)
+                    'rmse': self._find_best_system_by_metric(results, 'rmse', lower_is_better=True),
+                    'coverage': self._find_best_system_by_metric(results, 'coverage'),
+                    'diversity': self._find_best_system_by_metric(results, 'diversity')
                 }
             }
         }
@@ -1359,14 +1379,14 @@ class RecommenderEvaluator:
               f"Threshold={results['evaluation_params']['threshold']}, "
               f"Test Size={results['evaluation_params']['test_size']}")
         
-        print("\n" + "-"*80)
+        print("\n" + "-"*100)
         print("METRICS COMPARISON")
-        print("-"*80)
-        print(f"{'System':<20} {'Precision':<12} {'Recall':<12} {'F1-Score':<12} {'MSE':<12} {'RMSE':<12}")
-        print("-"*80)
-        print(f"{'Collaborative':<20} {collab['precision']:<12.4f} {collab['recall']:<12.4f} {collab['f1']:<12.4f} {collab['mse']:<12.4f} {collab['rmse']:<12.4f}")
-        print(f"{'Content-Based':<20} {content['precision']:<12.4f} {content['recall']:<12.4f} {content['f1']:<12.4f} {content['mse']:<12.4f} {content['rmse']:<12.4f}")
-        print(f"{f'Hybrid (α={best_alpha:.1f})':<20} {hybrid['precision']:<12.4f} {hybrid['recall']:<12.4f} {hybrid['f1']:<12.4f} {hybrid['mse']:<12.4f} {hybrid['rmse']:<12.4f}")
+        print("-"*100)
+        print(f"{'System':<20} {'Precision':<12} {'Recall':<12} {'F1-Score':<12} {'MSE':<12} {'RMSE':<12} {'Coverage':<12} {'Diversity':<12}")
+        print("-"*100)
+        print(f"{'Collaborative':<20} {collab['precision']:<12.4f} {collab['recall']:<12.4f} {collab['f1']:<12.4f} {collab['mse']:<12.4f} {collab['rmse']:<12.4f} {collab.get('coverage', 0):<12.4f} {collab.get('diversity', 0):<12.4f}")
+        print(f"{'Content-Based':<20} {content['precision']:<12.4f} {content['recall']:<12.4f} {content['f1']:<12.4f} {content['mse']:<12.4f} {content['rmse']:<12.4f} {content.get('coverage', 0):<12.4f} {content.get('diversity', 0):<12.4f}")
+        print(f"{f'Hybrid (α={best_alpha:.1f})':<20} {hybrid['precision']:<12.4f} {hybrid['recall']:<12.4f} {hybrid['f1']:<12.4f} {hybrid['mse']:<12.4f} {hybrid['rmse']:<12.4f} {hybrid.get('coverage', 0):<12.4f} {hybrid.get('diversity', 0):<12.4f}")
         
         print("\n" + "-"*80)
         print("BEST PERFORMING SYSTEM BY METRIC")
@@ -1383,7 +1403,7 @@ class RecommenderEvaluator:
                 'hybrid': hybrid
             }
             
-            for metric in ['precision', 'recall', 'f1']:
+            for metric in ['precision', 'recall', 'f1', 'coverage', 'diversity']:
                 best_system = max(systems.keys(), key=lambda x: systems[x][metric])
                 print(f"{metric.upper()}: {best_system} ({systems[best_system][metric]:.4f})")
             
@@ -1399,7 +1419,9 @@ class RecommenderEvaluator:
             print(f"Alpha {alpha:.1f}: F1={metrics['f1']:.4f}, "
                   f"Precision={metrics['precision']:.4f}, "
                   f"Recall={metrics['recall']:.4f}, "
-                  f"RMSE={metrics['rmse']:.4f}")
+                  f"RMSE={metrics['rmse']:.4f}, "
+                  f"Coverage={metrics['coverage']:.4f}, "
+                  f"Diversity={metrics['diversity']:.4f}")
     
     def run_full_evaluation(self, alpha_values=None):
         """

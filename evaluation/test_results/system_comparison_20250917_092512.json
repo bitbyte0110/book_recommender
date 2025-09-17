@@ -1,0 +1,220 @@
+{
+  "evaluation_date": "2025-09-17T09:25:12.830425",
+  "systems_comparison": {
+    "collaborative_filtering": {
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "mse": 1.0,
+      "rmse": 1.0,
+      "n_users_evaluated": 100,
+      "coverage": 0.7,
+      "books_recommended": 14,
+      "total_books": 20,
+      "diversity": 0.943327688426452
+    },
+    "content_based_filtering": {
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "mse": 1.0,
+      "rmse": 1.0,
+      "n_users_evaluated": 100,
+      "coverage": 0.7,
+      "books_recommended": 14,
+      "total_books": 20,
+      "diversity": 0.943327688426452
+    },
+    "hybrid_filtering": {
+      "best_alpha": 0.0,
+      "best_alpha_results": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0,
+        "mse": 1.0,
+        "rmse": 1.0,
+        "n_users_evaluated": 100,
+        "coverage": 0.7,
+        "books_recommended": 14,
+        "total_books": 20,
+        "diversity": 0.943327688426452
+      },
+      "all_alpha_results": {
+        "0.0": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        },
+        "0.1": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        },
+        "0.2": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        },
+        "0.3": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        },
+        "0.4": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        },
+        "0.5": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        },
+        "0.6": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        },
+        "0.7": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        },
+        "0.8": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        },
+        "0.9": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        },
+        "1.0": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 100,
+          "coverage": 0.7,
+          "books_recommended": 14,
+          "total_books": 20,
+          "diversity": 0.943327688426452
+        }
+      }
+    },
+    "evaluation_params": {
+      "top_n": 5,
+      "threshold": 3.0,
+      "test_size": 0.1,
+      "alpha_values": [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1.0
+      ]
+    }
+  },
+  "summary": {
+    "best_system_by_metric": {
+      "precision": {
+        "system": "collaborative",
+        "value": 0
+      },
+      "recall": {
+        "system": "collaborative",
+        "value": 0
+      },
+      "f1": {
+        "system": "collaborative",
+        "value": 0
+      },
+      "mse": {
+        "system": "collaborative",
+        "value": 1.0
+      },
+      "rmse": {
+        "system": "collaborative",
+        "value": 1.0
+      }
+    }
+  }
+}
