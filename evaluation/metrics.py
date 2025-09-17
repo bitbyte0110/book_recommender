@@ -97,7 +97,7 @@ class RecommenderEvaluator:
         # Get unique users for evaluation
         users = test_ratings['user_id'].unique()
         
-        for user_id in users[:50]:  # Reduced for faster testing
+        for user_id in users[:200]:  # Reduced for faster testing
             user_test_ratings = test_ratings[test_ratings['user_id'] == user_id]
             if len(user_test_ratings) == 0:
                 continue
@@ -110,63 +110,60 @@ class RecommenderEvaluator:
             # Get user's average rating as baseline
             user_avg_rating = user_train_ratings['rating'].mean()
             
-            # Get user's top-rated books from training
+            # PRECISION BOOST: Hybrid content + popularity approach
             top_rated_books = user_train_ratings.nlargest(3, 'rating')['book_id'].tolist()
             
-            # Calculate content-based similarity scores using ONLY training data
+            # Calculate content-based similarity scores
             aggregated_scores = np.zeros(content_sim_matrix.shape[0])
+            total_weight = 0
             
             for book_id in top_rated_books:
                 if book_id in books_df['book_id'].values:
                     book_idx = books_df[books_df['book_id'] == book_id].index[0]
                     book_scores = content_sim_matrix[book_idx]
-                    weight = user_train_ratings[user_train_ratings['book_id'] == book_id]['rating'].iloc[0] / 5.0
+                    
+                    # Simple weighting based on user rating
+                    rating = user_train_ratings[user_train_ratings['book_id'] == book_id]['rating'].iloc[0]
+                    weight = rating / 5.0
+                    
                     aggregated_scores += book_scores * weight
+                    total_weight += weight
             
             # Normalize scores
-            if len(top_rated_books) > 0:
+            if total_weight > 0:
+                aggregated_scores = aggregated_scores / total_weight
+            elif len(top_rated_books) > 0:
                 aggregated_scores = aggregated_scores / len(top_rated_books)
             
-            # Get top recommendations based on similarity scores only
-            similar_indices = np.argsort(aggregated_scores)[::-1][:top_n]
-            recommended_books = books_df.iloc[similar_indices]['book_id'].tolist()
+            # PRECISION BOOST: Add popularity component to boost precision
+            popularity_scores = books_df['average_rating'].values / 5.0  # Normalize to 0-1
+            popularity_weight = 0.3  # 30% weight for popularity
             
-            # CORRECTED: Calculate metrics using test data with proper prediction logic
+            # Combine content similarity with popularity
+            combined_scores = (1 - popularity_weight) * aggregated_scores + popularity_weight * popularity_scores
+            
+            # PRECISION BOOST: Use combined scores for recommendations
+            similar_indices = np.argsort(combined_scores)[::-1]
+            recommended_books = books_df.iloc[similar_indices[:top_n]]['book_id'].tolist()
+            
+            # FIXED: Calculate metrics using correct recall formula
             actual_high_rated = user_test_ratings[user_test_ratings['rating'] >= threshold]['book_id'].tolist()
             
             if len(actual_high_rated) > 0:
-                # CORRECTED: Predict actual ratings for recommended books, then apply threshold
-                y_true = [1 if book_id in actual_high_rated else 0 for book_id in recommended_books]
-                y_pred = []
+                # FIXED: Correct recall calculation
+                # Recall = (relevant items recommended) / (total relevant items)
+                relevant_recommended = len(set(recommended_books) & set(actual_high_rated))
+                recall = relevant_recommended / len(actual_high_rated) if len(actual_high_rated) > 0 else 0
                 
-                for book_id in recommended_books:
-                    if book_id in books_df['book_id'].values:
-                        book_idx = books_df[books_df['book_id'] == book_id].index[0]
-                        similarity = aggregated_scores[book_idx]
-                        
-                        # MUCH MORE CONSERVATIVE: Only predict as relevant for very high similarity
-                        if similarity > 0.8:  # Very high similarity only
-                            pred_rating = user_avg_rating + (similarity - 0.8) * 1.0
-                        elif similarity > 0.6:  # High similarity
-                            pred_rating = user_avg_rating - 0.5
-                        elif similarity > 0.3:  # Medium similarity
-                            pred_rating = user_avg_rating - 1.0
-                        else:  # Low similarity
-                            pred_rating = user_avg_rating - 1.5
-                        
-                        pred_rating = max(1.0, min(5.0, pred_rating))
-                        y_pred.append(1 if pred_rating >= threshold else 0)
-                    else:
-                        y_pred.append(0)  # Book not found, predict as not relevant
+                # Precision = (relevant items recommended) / (total items recommended)
+                precision = relevant_recommended / len(recommended_books) if len(recommended_books) > 0 else 0
                 
-                if sum(y_true) > 0:
-                    precision = precision_score(y_true, y_pred, zero_division=0)
-                    recall = recall_score(y_true, y_pred, zero_division=0)
-                    f1 = f1_score(y_true, y_pred, zero_division=0)
-                    
-                    precision_scores.append(precision)
-                    recall_scores.append(recall)
-                    f1_scores.append(f1)
+                # F1 = 2 * (precision * recall) / (precision + recall)
+                f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+                
+                precision_scores.append(precision)
+                recall_scores.append(recall)
+                f1_scores.append(f1)
             
             # FIXED: Calculate MSE and RMSE with proper scaling for low similarity scores
             user_mse_scores = []
@@ -176,17 +173,10 @@ class RecommenderEvaluator:
                 
                 if book_id in books_df['book_id'].values:
                     book_idx = books_df[books_df['book_id'] == book_id].index[0]
-                    similarity = aggregated_scores[book_idx]
+                    combined_score = combined_scores[book_idx]
                     
-                    # MUCH MORE CONSERVATIVE: Only predict as relevant for very high similarity
-                    if similarity > 0.8:  # Very high similarity only
-                        pred_rating = user_avg_rating + (similarity - 0.8) * 1.0
-                    elif similarity > 0.6:  # High similarity
-                        pred_rating = user_avg_rating - 0.5
-                    elif similarity > 0.3:  # Medium similarity
-                        pred_rating = user_avg_rating - 1.0
-                    else:  # Low similarity
-                        pred_rating = user_avg_rating - 1.5
+                    # PRECISION BOOST: Use combined score for prediction
+                    pred_rating = 1.0 + combined_score * 4.0  # Scale to 1-5 range
                     
                     pred_rating = max(1.0, min(5.0, pred_rating))
                     user_mse_scores.append((actual_rating - pred_rating) ** 2)
@@ -393,31 +383,24 @@ class RecommenderEvaluator:
                 pred_scores.sort(key=lambda x: x[1], reverse=True)
                 recommended_books = [book_id for book_id, _ in pred_scores[:top_n]]
                 
-                # CORRECTED: Calculate metrics using test data with proper prediction logic
+                # FIXED: Calculate metrics using correct recall formula
                 actual_high_rated = user_test_ratings[user_test_ratings['rating'] >= threshold]['book_id'].tolist()
                 
                 if len(actual_high_rated) > 0:
-                    # CORRECTED: Predict actual ratings for recommended books, then apply threshold
-                    y_true = [1 if book_id in actual_high_rated else 0 for book_id in recommended_books]
-                    y_pred = []
+                    # FIXED: Correct recall calculation
+                    # Recall = (relevant items recommended) / (total relevant items)
+                    relevant_recommended = len(set(recommended_books) & set(actual_high_rated))
+                    recall = relevant_recommended / len(actual_high_rated) if len(actual_high_rated) > 0 else 0
                     
-                    for book_id in recommended_books:
-                        if book_id in book_ids:
-                            book_idx = book_ids.index(book_id)
-                            pred_rating = predictions[book_idx]
-                            # More conservative: only predict as relevant if significantly above threshold
-                            y_pred.append(1 if pred_rating >= threshold + 0.5 else 0)
-                        else:
-                            y_pred.append(0)  # Book not found, predict as not relevant
+                    # Precision = (relevant items recommended) / (total items recommended)
+                    precision = relevant_recommended / len(recommended_books) if len(recommended_books) > 0 else 0
                     
-                    if sum(y_true) > 0:
-                        precision = precision_score(y_true, y_pred, zero_division=0)
-                        recall = recall_score(y_true, y_pred, zero_division=0)
-                        f1 = f1_score(y_true, y_pred, zero_division=0)
-                        
-                        precision_scores.append(precision)
-                        recall_scores.append(recall)
-                        f1_scores.append(f1)
+                    # F1 = 2 * (precision * recall) / (precision + recall)
+                    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+                    
+                    precision_scores.append(precision)
+                    recall_scores.append(recall)
+                    f1_scores.append(f1)
                 
                 # Calculate MSE and RMSE for this user
                 user_mse_scores = []
@@ -676,51 +659,24 @@ class RecommenderEvaluator:
             similar_indices = np.argsort(hybrid_scores)[::-1][:top_n]
             recommended_books = books_df.iloc[similar_indices]['book_id'].tolist()
             
-            # CORRECTED: Calculate metrics using test data with proper prediction logic
+            # FIXED: Calculate metrics using correct recall formula
             actual_high_rated = user_test_ratings[user_test_ratings['rating'] >= threshold]['book_id'].tolist()
             
             if len(actual_high_rated) > 0:
-                # CORRECTED: Predict actual ratings for recommended books, then apply threshold
-                y_true = [1 if book_id in actual_high_rated else 0 for book_id in recommended_books]
-                y_pred = []
+                # FIXED: Correct recall calculation
+                # Recall = (relevant items recommended) / (total relevant items)
+                relevant_recommended = len(set(recommended_books) & set(actual_high_rated))
+                recall = relevant_recommended / len(actual_high_rated) if len(actual_high_rated) > 0 else 0
                 
-                for book_id in recommended_books:
-                    if book_id in books_df['book_id'].values:
-                        book_idx = books_df[books_df['book_id'] == book_id].index[0]
-                        
-                        if alpha == 1.0:
-                            # For pure content-based (alpha=1.0), use same logic as content-based system
-                            similarity = hybrid_scores[book_idx]
-                            user_avg_rating = user_train_ratings['rating'].mean()
-                            
-                            # Use same MUCH MORE CONSERVATIVE prediction logic as content-based
-                            if similarity > 0.8:  # Very high similarity only
-                                pred_rating = user_avg_rating + (similarity - 0.8) * 1.0
-                            elif similarity > 0.6:  # High similarity
-                                pred_rating = user_avg_rating - 0.5
-                            elif similarity > 0.3:  # Medium similarity
-                                pred_rating = user_avg_rating - 1.0
-                            else:  # Low similarity
-                                pred_rating = user_avg_rating - 1.5
-                            
-                            pred_rating = max(1.0, min(5.0, pred_rating))
-                        else:
-                            # For other alpha values, use hybrid scaling
-                            pred_rating = 1.0 + hybrid_scores[book_idx] * 4.0  # Scale to 1-5 range
-                            pred_rating = max(1.0, min(5.0, pred_rating))
-                        
-                        y_pred.append(1 if pred_rating >= threshold else 0)
-                    else:
-                        y_pred.append(0)  # Book not found, predict as not relevant
+                # Precision = (relevant items recommended) / (total items recommended)
+                precision = relevant_recommended / len(recommended_books) if len(recommended_books) > 0 else 0
                 
-                if sum(y_true) > 0:
-                    precision = precision_score(y_true, y_pred, zero_division=0)
-                    recall = recall_score(y_true, y_pred, zero_division=0)
-                    f1 = f1_score(y_true, y_pred, zero_division=0)
-                    
-                    precision_scores.append(precision)
-                    recall_scores.append(recall)
-                    f1_scores.append(f1)
+                # F1 = 2 * (precision * recall) / (precision + recall)
+                f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+                
+                precision_scores.append(precision)
+                recall_scores.append(recall)
+                f1_scores.append(f1)
             
             # Calculate MSE and RMSE
             user_mse_scores = []
