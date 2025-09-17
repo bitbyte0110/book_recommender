@@ -535,7 +535,9 @@ def main():
                     content_sim_matrix, 
                     collab_sim_matrix, 
                     alpha=alpha, 
-                    top_n=num_recommendations
+                    top_n=num_recommendations,
+                    min_similarity=advanced_options.get('min_similarity', 0.1),
+                    diversity_weight=advanced_options.get('diversity_weight', 0.3)
                 )
                 
                 # Get separate recommendations for comparison

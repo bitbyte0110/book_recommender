@@ -45,8 +45,44 @@ def get_actual_method(alpha, is_hybrid, collab_data_available):
     else:
         return 'hybrid'
 
+def calculate_similarity_penalty(idx1, idx2, books_df, content_sim_matrix):
+    """
+    Calculate similarity penalty between two books for diversity filtering.
+    
+    Args:
+        idx1: Index of first book
+        idx2: Index of second book
+        books_df: DataFrame with book information
+        content_sim_matrix: Content-based similarity matrix
+    
+    Returns:
+        penalty: Similarity penalty value (0.0-1.0)
+    """
+    # Use content similarity as the base penalty
+    content_sim = content_sim_matrix[idx1, idx2]
+    
+    # Additional penalty based on same author
+    author1 = str(books_df.iloc[idx1].get('authors', '')).lower()
+    author2 = str(books_df.iloc[idx2].get('authors', '')).lower()
+    author_penalty = 0.3 if author1 == author2 and author1 != '' else 0.0
+    
+    # Additional penalty based on same publisher
+    publisher1 = str(books_df.iloc[idx1].get('publisher', '')).lower()
+    publisher2 = str(books_df.iloc[idx2].get('publisher', '')).lower()
+    publisher_penalty = 0.2 if publisher1 == publisher2 and publisher1 != '' else 0.0
+    
+    # Additional penalty based on same genre (if available)
+    genre1 = str(books_df.iloc[idx1].get('genre', '')).lower()
+    genre2 = str(books_df.iloc[idx2].get('genre', '')).lower()
+    genre_penalty = 0.1 if genre1 == genre2 and genre1 != '' else 0.0
+    
+    # Combine penalties
+    total_penalty = content_sim + author_penalty + publisher_penalty + genre_penalty
+    return min(total_penalty, 1.0)  # Cap at 1.0
+
 def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix, 
-                    alpha=0.6, top_n=10, fallback_to_content=True):
+                    alpha=0.6, top_n=10, min_similarity=0.1, diversity_weight=0.3, 
+                    fallback_to_content=True):
     """
     Generate hybrid recommendations combining content-based and collaborative filtering.
     
@@ -57,6 +93,8 @@ def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix
         collab_sim_matrix: Collaborative filtering similarity matrix
         alpha: Weight for content-based filtering (0 = pure collaborative, 1 = pure content)
         top_n: Number of recommendations to return
+        min_similarity: Minimum similarity score threshold (0.0-1.0)
+        diversity_weight: Weight for diversity penalty (0.0-1.0)
         fallback_to_content: Whether to fall back to content-based if collaborative fails
     
     Returns:
@@ -128,8 +166,48 @@ def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix
             else:
                 return []
         
-        # Get top recommendations (excluding the book itself)
-        similar_indices = np.argsort(hybrid_scores)[::-1][1:top_n+1]
+        # Apply minimum similarity filter
+        valid_indices = np.where(hybrid_scores >= min_similarity)[0]
+        # Exclude the book itself
+        valid_indices = valid_indices[valid_indices != book_idx]
+        
+        if len(valid_indices) == 0:
+            return []  # No recommendations meet the threshold
+        
+        # Apply diversity penalty if enabled
+        if diversity_weight > 0:
+            # Greedy selection with diversity penalty
+            selected_indices = []
+            remaining_indices = list(valid_indices)
+            
+            for _ in range(min(top_n, len(remaining_indices))):
+                if not remaining_indices:
+                    break
+                
+                # Calculate diversity-penalized scores for remaining books
+                penalized_scores = hybrid_scores[remaining_indices].copy()
+                
+                for i, idx in enumerate(remaining_indices):
+                    penalty = 0
+                    for selected_idx in selected_indices:
+                        similarity_penalty = calculate_similarity_penalty(
+                            idx, selected_idx, books_df, content_sim_matrix
+                        )
+                        penalty += similarity_penalty * diversity_weight
+                    
+                    penalized_scores[i] = hybrid_scores[idx] - penalty
+                
+                # Select the book with the highest penalized score
+                best_idx_pos = np.argmax(penalized_scores)
+                best_idx = remaining_indices[best_idx_pos]
+                selected_indices.append(best_idx)
+                remaining_indices.remove(best_idx)
+            
+            similar_indices = selected_indices
+        else:
+            # No diversity penalty, just sort by score
+            sorted_indices = np.argsort(hybrid_scores[valid_indices])[::-1]
+            similar_indices = valid_indices[sorted_indices][:top_n]
         
         # Create recommendations list
         recommendations = []
