@@ -157,13 +157,31 @@ def display_recommendation_analysis(recommendations):
         st.plotly_chart(fig, use_container_width=True)
     
     # Similarity score distribution
-    st.subheader("📊 Similarity Score Distribution")
+    st.subheader("📊 Current Distribution of Similarity Scores")
     scores = [rec.get('hybrid_score', 0) for rec in recommendations]
     if scores:
         fig = px.histogram(x=scores, nbins=10, 
                           title="Distribution of Similarity Scores",
                           labels={'x': 'Similarity Score', 'y': 'Count'})
         st.plotly_chart(fig, use_container_width=True)
+    
+    # Current Pearson correlation distribution
+    st.subheader("🎯 Current Pearson Correlation")
+    try:
+        # This will be populated by the main app with correlation data
+        if hasattr(st.session_state, 'current_pearson_correlations'):
+            corr_values = st.session_state.current_pearson_correlations
+            if corr_values:
+                fig = px.histogram(x=corr_values, nbins=10,
+                                  title="Pearson Correlation Distribution (Current Recs)",
+                                  labels={'x': 'Pearson Correlation', 'y': 'Count'})
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No sufficient co-ratings to compute Pearson correlation for current recommendations.")
+        else:
+            st.info("Pearson correlation data not available.")
+    except Exception as e:
+        st.info(f"Could not display Pearson correlation: {e}")
 
 def display_comparison_view(recommendations, alpha):
     """
