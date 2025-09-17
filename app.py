@@ -623,6 +623,49 @@ def main():
                     except Exception as e:
                         st.info(f"Could not render similarity distributions: {e}")
 
+                # Current recommendation set only: Pearson correlation vs selected book
+                with st.expander("🎯 Current Pearson Correlation"):
+                    try:
+                        # Build ratings matrix and compute correlation only for current recs
+                        user_item_matrix_curr = create_user_item_matrix(ratings_df, books_df)
+                        ratings_nan = user_item_matrix_curr.replace(0, np.nan)
+
+                        # Resolve selected book_id from title
+                        import re
+                        sel_matches = books_df[books_df['title'].str.lower().str.contains(re.escape(str(selected_book).lower()), regex=True, na=False)]
+                        if len(sel_matches) > 1:
+                            sel_matches = sel_matches.sort_values('book_id')
+                        selected_book_id = int(sel_matches.iloc[0]['book_id']) if len(sel_matches) > 0 else None
+
+                        # Collect rec book_ids
+                        rec_ids = [int(r.get('book_id')) for r in recommendations if isinstance(r.get('book_id'), (int, np.integer))]
+
+                        corr_values = []
+                        if selected_book_id is not None and selected_book_id in ratings_nan.columns:
+                            s_selected = ratings_nan[selected_book_id]
+                            for rid in rec_ids:
+                                if rid in ratings_nan.columns:
+                                    val = s_selected.corr(ratings_nan[rid], min_periods=2)
+                                    if pd.notna(val):
+                                        corr_values.append(float(val))
+
+                        if len(corr_values) > 0:
+                            current_corr_df = pd.DataFrame({"correlation": corr_values})
+                            current_corr_chart = (
+                                alt.Chart(current_corr_df)
+                                .mark_bar()
+                                .encode(
+                                    x=alt.X("correlation:Q", bin=alt.Bin(maxbins=20), title="Pearson Correlation"),
+                                    y=alt.Y("count()", title="count")
+                                )
+                                .properties(title="Pearson Correlation Distribution (Current Recs)")
+                            )
+                            st.altair_chart(current_corr_chart, use_container_width=True)
+                        else:
+                            st.info("No sufficient co-ratings to compute Pearson correlation for current recommendations.")
+                    except Exception as e:
+                        st.info(f"Could not compute current Pearson correlations: {e}")
+
                 # Success message
                 st.success("✅ Recommendations generated successfully!")
                 

@@ -189,3 +189,61 @@ Want me to:
 
 ---
 
+_**User (2025-09-17 15:42Z)**_
+
+yes, can u help me add a current recommendation set only for Pearson Correlation Distribution
+
+---
+
+_**Assistant**_
+
+
+
+---
+
+I’m going to add a new chart in the Detailed Analysis section that shows the Pearson correlation values between the selected book and its current recommendations only. Then I’ll run a quick lint check.
+
+---
+
+
+
+---
+
+
+
+---
+
+- I added a new expander “🎯 Current Pearson Correlation (Selected vs Recommendations)” that computes Pearson correlations only between the selected book and the current recommendation list and shows a histogram.
+- It treats unrated entries as NaN and requires at least 2 co-ratings per pair; if there aren’t enough co-ratings, it shows a friendly info message.
+- Lint check passed.
+
+If you want, I can also add a small table under that chart listing each recommended title with its Pearson value for quick inspection.
+
+---
+
+_**User (2025-09-17 15:42Z)**_
+
+actully do i need to show global  Distibution? or i can just delete
+
+---
+
+_**Assistant**_
+
+You can delete the global distribution charts if you prefer to keep only the current recommendation-specific analysis. The global distributions are mainly useful for:
+
+- **Understanding your dataset's overall similarity landscape**
+- **Debugging/validating your similarity matrices**
+- **Comparing different similarity metrics across the whole catalog**
+
+But if you only care about the **current recommendations**, you can remove the global charts and keep just:
+- The current recommendation similarity scores (top chart)
+- The current Pearson correlation distribution (the one I just added)
+
+Would you like me to:
+1. **Delete the global distribution expander entirely**, or
+2. **Keep it but move it to a separate "Debug/Advanced" section** that's collapsed by default?
+
+The current recommendation charts are more actionable for users since they directly relate to their specific search results.
+
+---
+
