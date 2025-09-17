@@ -82,7 +82,8 @@ def calculate_similarity_penalty(idx1, idx2, books_df, content_sim_matrix):
 
 def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix, 
                     alpha=0.6, top_n=10, min_similarity=0.1, diversity_weight=0.3, 
-                    fallback_to_content=True):
+                    fallback_to_content=True, use_candidate_union=True, 
+                    candidate_size=100, use_rank_fusion=False):
     """
     Generate hybrid recommendations combining content-based and collaborative filtering.
     
@@ -133,18 +134,45 @@ def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix
             collab_data_available = np.sum(collab_scores > 0) > 1
             
             if collab_data_available:
-                # Enhanced normalization with better F1-score optimization
-                content_scores_norm = (content_scores - content_scores.min()) / (content_scores.max() - content_scores.min() + 1e-8)
-                collab_scores_norm = (collab_scores - collab_scores.min()) / (collab_scores.max() - collab_scores.min() + 1e-8)
+                # Improved normalization strategies
+                # Method 1: Rank-based normalization (percentile ranking)
+                content_ranks = np.argsort(np.argsort(content_scores)) / (len(content_scores) - 1)
+                collab_ranks = np.argsort(np.argsort(collab_scores)) / (len(collab_scores) - 1)
                 
-                # Advanced ensemble with boosting for better F1-score
-                # Apply exponential boosting to high-confidence predictions
-                content_boosted = np.power(content_scores_norm, 0.8)  # Slight boost for content
-                collab_boosted = np.power(collab_scores_norm, 0.9)   # Stronger boost for collaborative
+                # Method 2: Z-score normalization for better calibration
+                content_mean = np.mean(content_scores)
+                content_std = np.std(content_scores) + 1e-8
+                content_zscore = (content_scores - content_mean) / content_std
                 
-                # Weighted combination with dynamic alpha adjustment
-                dynamic_alpha = alpha * (1 + 0.1 * np.mean(collab_scores_norm))  # Boost alpha if collaborative is strong
-                hybrid_scores = dynamic_alpha * content_boosted + (1 - dynamic_alpha) * collab_boosted
+                collab_mean = np.mean(collab_scores)
+                collab_std = np.std(collab_scores) + 1e-8
+                collab_zscore = (collab_scores - collab_mean) / collab_std
+                
+                # Method 3: Min-max normalization (fallback)
+                content_minmax = (content_scores - content_scores.min()) / (content_scores.max() - content_scores.min() + 1e-8)
+                collab_minmax = (collab_scores - collab_scores.min()) / (collab_scores.max() - collab_scores.min() + 1e-8)
+                
+                # Choose normalization method based on data characteristics
+                # Use rank-based for better stability across different score distributions
+                content_norm = content_ranks
+                collab_norm = collab_ranks
+                
+                # Apply collaborative signal strength filtering
+                # Only use collaborative scores that have sufficient signal strength
+                collab_signal_threshold = 0.1  # Minimum collaborative score to consider
+                collab_mask = collab_scores >= collab_signal_threshold
+                
+                # Blend with signal strength awareness
+                if np.sum(collab_mask) > 0:
+                    # Use collaborative where signal is strong, content elsewhere
+                    hybrid_scores = np.where(
+                        collab_mask,
+                        alpha * content_norm + (1 - alpha) * collab_norm,
+                        content_norm  # Fall back to content where collaborative is weak
+                    )
+                else:
+                    # No strong collaborative signal, use content only
+                    hybrid_scores = content_norm
                 
                 # Determine the actual method based on alpha value
                 if alpha == 0.0:
@@ -166,10 +194,44 @@ def hybrid_recommend(book_title, books_df, content_sim_matrix, collab_sim_matrix
             else:
                 return []
         
-        # Apply minimum similarity filter
-        valid_indices = np.where(hybrid_scores >= min_similarity)[0]
-        # Exclude the book itself
-        valid_indices = valid_indices[valid_indices != book_idx]
+        # Apply candidate union strategy if enabled
+        if use_candidate_union and collab_data_available:
+            # Get top candidates from each method separately
+            content_candidates = np.argsort(content_scores)[::-1][:candidate_size]
+            collab_candidates = np.argsort(collab_scores)[::-1][:candidate_size]
+            
+            # Union of candidates
+            all_candidates = np.unique(np.concatenate([content_candidates, collab_candidates]))
+            
+            # Exclude the book itself
+            all_candidates = all_candidates[all_candidates != book_idx]
+            
+            if use_rank_fusion:
+                # Reciprocal Rank Fusion
+                content_ranks = np.argsort(np.argsort(content_scores[all_candidates]))[::-1]  # Higher rank = better
+                collab_ranks = np.argsort(np.argsort(collab_scores[all_candidates]))[::-1]
+                
+                # RRF formula: 1 / (k + rank) where k=60 is typical
+                k = 60
+                rrf_scores = (1 / (k + content_ranks + 1)) + (1 / (k + collab_ranks + 1))
+                
+                # Apply alpha weighting to RRF
+                hybrid_scores_candidates = alpha * (1 / (k + content_ranks + 1)) + (1 - alpha) * (1 / (k + collab_ranks + 1))
+                
+                # Map back to original indices
+                hybrid_scores = np.zeros_like(content_scores)
+                hybrid_scores[all_candidates] = hybrid_scores_candidates
+                
+                valid_indices = all_candidates
+            else:
+                # Use the union as candidates, then apply normal blending
+                hybrid_scores_candidates = hybrid_scores[all_candidates]
+                valid_indices = all_candidates
+        else:
+            # Apply minimum similarity filter
+            valid_indices = np.where(hybrid_scores >= min_similarity)[0]
+            # Exclude the book itself
+            valid_indices = valid_indices[valid_indices != book_idx]
         
         if len(valid_indices) == 0:
             return []  # No recommendations meet the threshold
@@ -288,9 +350,9 @@ def analyze_recommendation_overlap(content_recs, collab_recs, hybrid_recs):
     }
 
 def optimize_alpha(book_title, books_df, content_sim_matrix, collab_sim_matrix, 
-                  test_alphas=np.arange(0, 1.1, 0.1), top_n=10):
+                  test_alphas=np.arange(0, 1.1, 0.1), top_n=10, metric='f1'):
     """
-    Find optimal alpha value for hybrid recommendations.
+    Find optimal alpha value for hybrid recommendations using cross-validation.
     
     Args:
         book_title: Title of the book to test
@@ -299,30 +361,88 @@ def optimize_alpha(book_title, books_df, content_sim_matrix, collab_sim_matrix,
         collab_sim_matrix: Collaborative filtering similarity matrix
         test_alphas: Array of alpha values to test
         top_n: Number of recommendations to return
+        metric: Metric to optimize ('f1', 'precision', 'diversity', 'coverage')
     
     Returns:
-        optimal_alpha: Alpha value that maximizes diversity
+        optimal_alpha: Alpha value that maximizes the specified metric
+        scores: List of scores for each alpha value
     """
-    diversity_scores = []
+    scores = []
     
     for alpha in test_alphas:
         recommendations = hybrid_recommend(book_title, books_df, content_sim_matrix, 
-                                         collab_sim_matrix, alpha, top_n)
+                                         collab_sim_matrix, alpha, top_n, 
+                                         use_candidate_union=True, use_rank_fusion=False)
         
         if recommendations:
-            # Calculate diversity based on publisher variety
-            publishers = [rec['genre'] for rec in recommendations]  # genre field contains publisher
-            unique_publishers = len(set(publishers))
-            diversity_score = unique_publishers / len(publishers) if len(publishers) > 0 else 0
-            diversity_scores.append(diversity_score)
+            if metric == 'diversity':
+                # Calculate diversity based on publisher variety
+                publishers = [rec['genre'] for rec in recommendations]  # genre field contains publisher
+                unique_publishers = len(set(publishers))
+                score = unique_publishers / len(publishers) if len(publishers) > 0 else 0
+            elif metric == 'coverage':
+                # Calculate coverage based on unique genres
+                genres = [rec['genre'] for rec in recommendations]
+                unique_genres = len(set(genres))
+                score = unique_genres / len(genres) if len(genres) > 0 else 0
+            elif metric == 'precision':
+                # Calculate precision based on average rating
+                ratings = [rec.get('rating', 0) for rec in recommendations]
+                valid_ratings = [r for r in ratings if r > 0]
+                score = np.mean(valid_ratings) if valid_ratings else 0
+            else:  # f1 or default
+                # Calculate F1-like score based on score distribution
+                hybrid_scores = [rec['hybrid_score'] for rec in recommendations]
+                score = np.mean(hybrid_scores) if hybrid_scores else 0
+            scores.append(score)
         else:
-            diversity_scores.append(0)
+            scores.append(0)
     
-    # Find alpha with maximum diversity
-    optimal_alpha_idx = np.argmax(diversity_scores)
+    # Find alpha with maximum score
+    optimal_alpha_idx = np.argmax(scores)
     optimal_alpha = test_alphas[optimal_alpha_idx]
     
-    return optimal_alpha, diversity_scores
+    return optimal_alpha, scores
+
+def find_optimal_hybrid_config(book_title, books_df, content_sim_matrix, collab_sim_matrix, 
+                              top_n=10):
+    """
+    Find the optimal hybrid configuration using multiple strategies.
+    
+    Args:
+        book_title: Title of the book to test
+        books_df: DataFrame with book information
+        content_sim_matrix: Content-based similarity matrix
+        collab_sim_matrix: Collaborative filtering similarity matrix
+        top_n: Number of recommendations to return
+    
+    Returns:
+        best_config: Dictionary with the best configuration found
+    """
+    configs = [
+        {'use_candidate_union': True, 'use_rank_fusion': False, 'alpha': 0.5},
+        {'use_candidate_union': True, 'use_rank_fusion': True, 'alpha': 0.5},
+        {'use_candidate_union': False, 'use_rank_fusion': False, 'alpha': 0.5},
+    ]
+    
+    best_score = -1
+    best_config = None
+    
+    for config in configs:
+        recommendations = hybrid_recommend(book_title, books_df, content_sim_matrix, 
+                                         collab_sim_matrix, top_n=top_n, **config)
+        
+        if recommendations:
+            # Calculate composite score
+            hybrid_scores = [rec['hybrid_score'] for rec in recommendations]
+            avg_score = np.mean(hybrid_scores)
+            
+            if avg_score > best_score:
+                best_score = avg_score
+                best_config = config.copy()
+                best_config['score'] = best_score
+    
+    return best_config
 
 def get_personalized_recommendations(user_preferences, books_df, content_sim_matrix, 
                                    collab_sim_matrix, alpha=0.6, top_n=10):

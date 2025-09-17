@@ -689,8 +689,8 @@ class RecommenderEvaluator:
                         pred = max(1.0, min(5.0, pred))
                         collab_scores[i] = pred / 5.0  # Normalize to 0-1
             
-            # Combine scores with alpha weight
-            hybrid_scores = alpha * collab_scores + (1 - alpha) * content_scores
+            # Combine scores with alpha weight (alpha = content weight, consistent with app)
+            hybrid_scores = alpha * content_scores + (1 - alpha) * collab_scores
             
             # Get top recommendations based on hybrid scores only
             similar_indices = np.argsort(hybrid_scores)[::-1][:top_n]
@@ -1304,6 +1304,11 @@ class RecommenderEvaluator:
         
         # Generate comparison report
         report = self.generate_comparison_report(comparison_results)
+        # Also save Markdown/CSV tables for easy reporting
+        table_paths = self._save_markdown_and_csv_tables(comparison_results)
+        print("Saved comparison tables:")
+        for k, v in table_paths.items():
+            print(f"  - {k}: {v}")
         
         # Print comparison summary
         self.print_comparison_summary(comparison_results, report)
@@ -1340,6 +1345,87 @@ class RecommenderEvaluator:
         
         print(f"Comparison report saved to: {output_file}")
         return report
+
+    def _save_markdown_and_csv_tables(self, results):
+        """
+        Create and save metrics tables (Markdown and CSV) for easy inclusion in reports.
+        """
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        out_dir = self.results_dir
+        os.makedirs(out_dir, exist_ok=True)
+
+        # Systems comparison table (best hybrid at its best alpha)
+        collab = results['collaborative_filtering']
+        content = results['content_based_filtering']
+        hybrid_best = results['hybrid_filtering']['best_alpha_results']
+        best_alpha = results['hybrid_filtering']['best_alpha']
+
+        systems_df = pd.DataFrame([
+            {
+                'System': 'Collaborative',
+                'Precision': collab['precision'],
+                'Recall': collab['recall'],
+                'F1': collab['f1'],
+                'MSE': collab['mse'],
+                'RMSE': collab['rmse'],
+                'Coverage': collab['coverage'],
+                'Diversity': collab['diversity']
+            },
+            {
+                'System': 'Content-Based',
+                'Precision': content['precision'],
+                'Recall': content['recall'],
+                'F1': content['f1'],
+                'MSE': content['mse'],
+                'RMSE': content['rmse'],
+                'Coverage': content['coverage'],
+                'Diversity': content['diversity']
+            },
+            {
+                'System': f'Hybrid (α={best_alpha:.1f})',
+                'Precision': hybrid_best['precision'],
+                'Recall': hybrid_best['recall'],
+                'F1': hybrid_best['f1'],
+                'MSE': hybrid_best['mse'],
+                'RMSE': hybrid_best['rmse'],
+                'Coverage': hybrid_best['coverage'],
+                'Diversity': hybrid_best['diversity']
+            }
+        ])
+
+        systems_md_path = os.path.join(out_dir, f"systems_comparison_{timestamp}.md")
+        systems_csv_path = os.path.join(out_dir, f"systems_comparison_{timestamp}.csv")
+        with open(systems_md_path, 'w') as f:
+            f.write(systems_df.to_markdown(index=False, floatfmt=".4f"))
+        systems_df.to_csv(systems_csv_path, index=False)
+
+        # Hybrid per-alpha table
+        alpha_rows = []
+        for alpha, mets in results['hybrid_filtering']['all_alpha_results'].items():
+            alpha_rows.append({
+                'Alpha': alpha,
+                'Precision': mets['precision'],
+                'Recall': mets['recall'],
+                'F1': mets['f1'],
+                'MSE': mets['mse'],
+                'RMSE': mets['rmse'],
+                'Coverage': mets['coverage'],
+                'Diversity': mets['diversity']
+            })
+        hybrid_alpha_df = pd.DataFrame(alpha_rows).sort_values('Alpha')
+
+        hybrid_md_path = os.path.join(out_dir, f"hybrid_alpha_metrics_{timestamp}.md")
+        hybrid_csv_path = os.path.join(out_dir, f"hybrid_alpha_metrics_{timestamp}.csv")
+        with open(hybrid_md_path, 'w') as f:
+            f.write(hybrid_alpha_df.to_markdown(index=False, floatfmt=".4f"))
+        hybrid_alpha_df.to_csv(hybrid_csv_path, index=False)
+
+        return {
+            'systems_markdown': systems_md_path,
+            'systems_csv': systems_csv_path,
+            'hybrid_markdown': hybrid_md_path,
+            'hybrid_csv': hybrid_csv_path
+        }
     
     def _find_best_system_by_metric(self, results, metric, lower_is_better=False):
         """

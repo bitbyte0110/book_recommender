@@ -529,7 +529,7 @@ def main():
         if generate_button and selected_book:
             # Show loading message
             with st.spinner("🤖 Generating your personalized recommendations..."):
-                # Get hybrid recommendations
+                # Get hybrid recommendations with improved blending
                 recommendations = hybrid_recommend(
                     selected_book, 
                     books_df, 
@@ -538,7 +538,10 @@ def main():
                     alpha=alpha, 
                     top_n=num_recommendations,
                     min_similarity=advanced_options.get('min_similarity', 0.1),
-                    diversity_weight=advanced_options.get('diversity_weight', 0.3)
+                    diversity_weight=advanced_options.get('diversity_weight', 0.3),
+                    use_candidate_union=True,  # Enable candidate union strategy
+                    candidate_size=100,       # Top 100 from each method
+                    use_rank_fusion=False    # Use score blending instead of RRF
                 )
                 
                 # Get separate recommendations for comparison
