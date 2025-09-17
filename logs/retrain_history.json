@@ -1,0 +1,126 @@
+{
+  "retrain_events": [
+    {
+      "type": "failed",
+      "error": "'book_id'",
+      "success": false,
+      "timestamp": "2025-09-18T03:10:26.378606",
+      "event_id": 1
+    },
+    {
+      "type": "full",
+      "books_count": 20,
+      "ratings_count": 8759,
+      "performance": {
+        "rmse": 3.1741547964856793,
+        "mae": 0.0,
+        "precision": 0.2101190476190476,
+        "recall": 1.0,
+        "f1": 0.336417550703265,
+        "coverage": 0.85,
+        "diversity": 0.9530956836424405
+      },
+      "success": true,
+      "timestamp": "2025-09-18T03:13:54.371959",
+      "event_id": 2
+    },
+    {
+      "type": "full",
+      "books_count": 20,
+      "ratings_count": 8759,
+      "performance": {
+        "rmse": 3.1741547964856793,
+        "mae": 0.0,
+        "precision": 0.2101190476190476,
+        "recall": 1.0,
+        "f1": 0.336417550703265,
+        "coverage": 0.85,
+        "diversity": 0.9530956836424405
+      },
+      "success": true,
+      "timestamp": "2025-09-18T03:18:35.747550",
+      "event_id": 3
+    },
+    {
+      "type": "full",
+      "books_count": 20,
+      "ratings_count": 8759,
+      "performance": {
+        "rmse": 3.1741547964856793,
+        "mae": 0.0,
+        "precision": 0.2101190476190476,
+        "recall": 1.0,
+        "f1": 0.336417550703265,
+        "coverage": 0.85,
+        "diversity": 0.9530956836424405
+      },
+      "success": true,
+      "timestamp": "2025-09-18T03:20:38.974759",
+      "event_id": 4
+    },
+    {
+      "type": "failed",
+      "error": "'dict' object has no attribute 'get_params'",
+      "success": false,
+      "timestamp": "2025-09-18T03:21:37.924430",
+      "event_id": 5
+    },
+    {
+      "type": "full",
+      "books_count": 20,
+      "ratings_count": 8759,
+      "performance": {
+        "rmse": 0.43243686064297704,
+        "mae": 0.0,
+        "precision": 0.22472527472527476,
+        "recall": 1.0,
+        "f1": 0.3546714274736253,
+        "coverage": 0.85,
+        "diversity": 0.9530956836424405
+      },
+      "success": true,
+      "timestamp": "2025-09-18T03:22:32.859046",
+      "event_id": 6
+    }
+  ],
+  "total_retrains": 6,
+  "last_retrain": "2025-09-18T03:22:32.859046",
+  "performance_trends": [
+    {
+      "rmse": 3.1741547964856793,
+      "mae": 0.0,
+      "precision": 0.2101190476190476,
+      "recall": 1.0,
+      "f1": 0.336417550703265,
+      "coverage": 0.85,
+      "diversity": 0.9530956836424405
+    },
+    {
+      "rmse": 3.1741547964856793,
+      "mae": 0.0,
+      "precision": 0.2101190476190476,
+      "recall": 1.0,
+      "f1": 0.336417550703265,
+      "coverage": 0.85,
+      "diversity": 0.9530956836424405
+    },
+    {
+      "rmse": 3.1741547964856793,
+      "mae": 0.0,
+      "precision": 0.2101190476190476,
+      "recall": 1.0,
+      "f1": 0.336417550703265,
+      "coverage": 0.85,
+      "diversity": 0.9530956836424405
+    },
+    {
+      "rmse": 0.43243686064297704,
+      "mae": 0.0,
+      "precision": 0.22472527472527476,
+      "recall": 1.0,
+      "f1": 0.3546714274736253,
+      "coverage": 0.85,
+      "diversity": 0.9530956836424405
+    }
+  ]
+}

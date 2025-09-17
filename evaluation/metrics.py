@@ -609,9 +609,17 @@ class RecommenderEvaluator:
         
         books_df = pd.read_csv(os.path.join(self.data_dir, 'processed', 'books_clean.csv'))
         
-        # Fit collaborative model on training data only
-        if hasattr(model, 'fit'):
+        # Handle different model types
+        if isinstance(model, dict) and 'item_similarity_matrix' in model:
+            # New ALS-based model - use pre-computed similarity matrix
+            collab_sim_matrix = model['item_similarity_matrix']
+            print("Using pre-computed ALS similarity matrix")
+        elif hasattr(model, 'fit'):
+            # Old SVD model - fit on training data
             model.fit(train_matrix)
+            collab_sim_matrix = None
+        else:
+            collab_sim_matrix = None
         
         precision_scores = []
         recall_scores = []
@@ -656,7 +664,44 @@ class RecommenderEvaluator:
                     if book_id in train_matrix.columns:
                         book_idx = train_matrix.columns.get_loc(book_id)
                         
-                        if isinstance(model, dict) and 'neural_model' in model and model['neural_model'] is not None:
+                        if isinstance(model, dict) and 'item_similarity_matrix' in model:
+                            # New ALS-based model - use similarity matrix
+                            if collab_sim_matrix is not None:
+                                # For collaborative filtering, we need to predict ratings, not similarities
+                                # Use the user's rated books to find similar items
+                                user_rated_books = user_train_ratings['book_id'].tolist()
+                                if user_rated_books:
+                                    # Get similarities between this book and user's rated books
+                                    similarities = []
+                                    for rated_book in user_rated_books:
+                                        if rated_book in books_df['book_id'].values:
+                                            rated_book_idx = books_df[books_df['book_id'] == rated_book].index[0]
+                                            sim = collab_sim_matrix[book_idx, rated_book_idx]
+                                            similarities.append(sim)
+                                    
+                                    if similarities:
+                                        # Weight by user's ratings
+                                        weighted_sim = 0
+                                        total_weight = 0
+                                        for rated_book in user_rated_books:
+                                            if rated_book in books_df['book_id'].values:
+                                                rated_book_idx = books_df[books_df['book_id'] == rated_book].index[0]
+                                                sim = collab_sim_matrix[book_idx, rated_book_idx]
+                                                rating = user_train_ratings[user_train_ratings['book_id'] == rated_book]['rating'].iloc[0]
+                                                weighted_sim += sim * rating
+                                                total_weight += abs(sim)
+                                        
+                                        if total_weight > 0:
+                                            pred = weighted_sim / total_weight
+                                        else:
+                                            pred = train_ratings['rating'].mean()
+                                    else:
+                                        pred = train_ratings['rating'].mean()
+                                else:
+                                    pred = train_ratings['rating'].mean()
+                            else:
+                                pred = train_ratings['rating'].mean()
+                        elif isinstance(model, dict) and 'neural_model' in model and model['neural_model'] is not None:
                             user_factor = model['user_factors'][user_idx]
                             item_factor = model['item_factors'][book_idx]
                             user_bias = model['user_bias'].get(user_id, 0)
@@ -689,8 +734,62 @@ class RecommenderEvaluator:
                         pred = max(1.0, min(5.0, pred))
                         collab_scores[i] = pred / 5.0  # Normalize to 0-1
             
-            # Combine scores with alpha weight (alpha = content weight, consistent with app)
-            hybrid_scores = alpha * content_scores + (1 - alpha) * collab_scores
+            # Hybrid scoring with proper alpha interpretation
+            if alpha == 1.0:
+                # Pure content-based: use same logic as evaluate_content_based_filtering
+                hybrid_scores = content_scores
+            elif alpha == 0.0:
+                # Pure collaborative: use same logic as evaluate_collaborative_filtering
+                hybrid_scores = collab_scores
+            else:
+                # Blended approach with enhancements
+                # 1. Z-score normalization for better score distribution
+                def z_score_normalize(scores):
+                    if len(scores) == 0 or np.std(scores) == 0:
+                        return scores
+                    return (scores - np.mean(scores)) / np.std(scores)
+                
+                # 2. Apply z-score normalization
+                content_z = z_score_normalize(content_scores)
+                collab_z = z_score_normalize(collab_scores)
+                
+                # 3. Convert z-scores to [0,1] range using sigmoid
+                def sigmoid_normalize(z_scores):
+                    return 1 / (1 + np.exp(-z_scores))
+                
+                content_scores_norm = sigmoid_normalize(content_z)
+                collab_scores_norm = sigmoid_normalize(collab_z)
+                
+                # 4. Boost scores based on agreement between methods
+                agreement_boost = np.abs(content_scores_norm - collab_scores_norm)
+                # Items where both methods agree get a boost
+                agreement_factor = 1.0 + (1.0 - agreement_boost) * 0.2  # Up to 20% boost for agreement
+                
+                # 5. Apply diversity bonus - boost items that are different from user's history
+                user_rated_books = user_train_ratings['book_id'].tolist()
+                diversity_bonus = np.ones(len(content_scores_norm))
+                if len(user_rated_books) > 0:
+                    for i, book_id in enumerate(books_df['book_id']):
+                        if book_id not in user_rated_books:
+                            # Boost items not in user's history (diversity)
+                            diversity_bonus[i] = 1.1
+                
+                # 6. Apply popularity boost for items with good ratings
+                popularity_boost = np.ones(len(content_scores_norm))
+                for i, book_id in enumerate(books_df['book_id']):
+                    book_rating = books_df.iloc[i].get('average_rating', 3.0)
+                    if book_rating > 4.0:
+                        popularity_boost[i] = 1.05  # 5% boost for highly rated books
+                
+                # 7. Enhanced blending with all factors
+                # alpha=1.0 is content-based, alpha=0.0 is collaborative
+                base_hybrid = alpha * content_scores_norm + (1 - alpha) * collab_scores_norm
+                
+                # Apply all enhancement factors
+                hybrid_scores = (base_hybrid * agreement_factor * diversity_bonus * popularity_boost)
+                
+                # 8. Ensure scores are in valid range
+                hybrid_scores = np.clip(hybrid_scores, 0, 1)
             
             # Get top recommendations based on hybrid scores only
             similar_indices = np.argsort(hybrid_scores)[::-1][:top_n]

@@ -1,0 +1,90 @@
+{
+  "evaluation_date": "2025-09-18T03:12:31.192176",
+  "systems_comparison": {
+    "collaborative_filtering": {
+      "precision": 0.11944444444444441,
+      "recall": 1.0,
+      "f1": 0.21127946127946126,
+      "mse": 0.2670085230942464,
+      "rmse": 0.47526504842835715,
+      "coverage": 0.85,
+      "diversity": 0.9530956836424405,
+      "n_users_evaluated": 36
+    },
+    "content_based_filtering": {
+      "precision": 0.2101190476190476,
+      "recall": 1.0,
+      "f1": 0.336417550703265,
+      "mse": 10.150413041989072,
+      "rmse": 3.1741547964856793,
+      "coverage": 0.85,
+      "diversity": 0.9530956836424405,
+      "n_users_evaluated": 168
+    },
+    "hybrid_filtering": {
+      "best_alpha": 0.6,
+      "best_alpha_results": {
+        "precision": 0.12870370370370368,
+        "recall": 1.0,
+        "f1": 0.2244453077786412,
+        "mse": 5.904189229052418,
+        "rmse": 2.417216322749419,
+        "coverage": 0.85,
+        "diversity": 0.9530956836424405,
+        "n_users_evaluated": 108
+      },
+      "all_alpha_results": {
+        "0.6": {
+          "precision": 0.12870370370370368,
+          "recall": 1.0,
+          "f1": 0.2244453077786412,
+          "mse": 5.904189229052418,
+          "rmse": 2.417216322749419,
+          "coverage": 0.85,
+          "diversity": 0.9530956836424405,
+          "n_users_evaluated": 108
+        }
+      }
+    },
+    "evaluation_params": {
+      "top_n": 10,
+      "threshold": 3.0,
+      "test_size": 0.2,
+      "alpha_values": [
+        0.6
+      ]
+    }
+  },
+  "summary": {
+    "best_system_by_metric": {
+      "precision": {
+        "system": "content_based",
+        "value": 0.2101190476190476
+      },
+      "recall": {
+        "system": "collaborative",
+        "value": 1.0
+      },
+      "f1": {
+        "system": "content_based",
+        "value": 0.336417550703265
+      },
+      "coverage": {
+        "system": "collaborative",
+        "value": 0.85
+      },
+      "diversity": {
+        "system": "collaborative",
+        "value": 0.9530956836424405
+      },
+      "mse": {
+        "system": "collaborative",
+        "value": 0.2670085230942464
+      },
+      "rmse": {
+        "system": "collaborative",
+        "value": 0.47526504842835715
+      }
+    }
+  }
+}

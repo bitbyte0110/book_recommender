@@ -1,0 +1,60 @@
+2025-09-18 03:10:17,752 - INFO - Starting model retraining...
+2025-09-18 03:10:17,753 - INFO - Model age: 12 days
+2025-09-18 03:10:17,753 - INFO - Model is 12 days old. No retraining needed.
+2025-09-18 03:10:17,753 - INFO - Model is recent. Use --force to retrain anyway.
+2025-09-18 03:10:26,324 - INFO - Starting model retraining...
+2025-09-18 03:10:26,325 - INFO - Performing full retraining...
+2025-09-18 03:10:26,370 - ERROR - Error during retraining: 'book_id'
+2025-09-18 03:12:25,257 - INFO - Starting model retraining...
+2025-09-18 03:12:25,257 - INFO - Performing full retraining...
+2025-09-18 03:12:31,206 - ERROR - Error evaluating current performance: 0.6
+2025-09-18 03:12:31,206 - ERROR - Failed to evaluate new model performance.
+2025-09-18 03:13:24,277 - INFO - Starting model retraining...
+2025-09-18 03:13:24,278 - INFO - Performing full retraining...
+2025-09-18 03:13:54,373 - INFO - Model retraining completed successfully!
+2025-09-18 03:13:54,373 - INFO - New performance - RMSE: 3.1742, F1: 0.3364
+2025-09-18 03:13:54,388 - INFO - Model age: 0 days
+2025-09-18 03:13:54,388 - INFO - Model is 0 days old. No retraining needed.
+2025-09-18 03:13:54,399 - INFO - Insufficient performance history for drift detection.
+2025-09-18 03:14:24,986 - INFO - Model age: 0 days
+2025-09-18 03:14:24,987 - INFO - Model is 0 days old. No retraining needed.
+2025-09-18 03:14:24,987 - INFO - Insufficient performance history for drift detection.
+2025-09-18 03:18:09,802 - INFO - Starting model retraining...
+2025-09-18 03:18:09,802 - INFO - Performing full retraining...
+2025-09-18 03:18:35,748 - INFO - Model retraining completed successfully!
+2025-09-18 03:18:35,748 - INFO - New performance - RMSE: 3.1742, F1: 0.3364
+2025-09-18 03:18:35,750 - INFO - Model age: 0 days
+2025-09-18 03:18:35,750 - INFO - Model is 0 days old. No retraining needed.
+2025-09-18 03:18:35,759 - INFO - RMSE change: 0.0000, F1 change: 0.0000
+2025-09-18 03:18:35,759 - INFO - No significant model drift detected.
+2025-09-18 03:19:01,510 - INFO - Model age: 0 days
+2025-09-18 03:19:01,510 - INFO - Model is 0 days old. No retraining needed.
+2025-09-18 03:19:01,510 - INFO - RMSE change: 0.0000, F1 change: 0.0000
+2025-09-18 03:19:01,510 - INFO - No significant model drift detected.
+2025-09-18 03:20:11,595 - INFO - Starting model retraining...
+2025-09-18 03:20:11,596 - INFO - Performing full retraining...
+2025-09-18 03:20:38,975 - INFO - Model retraining completed successfully!
+2025-09-18 03:20:38,976 - INFO - New performance - RMSE: 3.1742, F1: 0.3364
+2025-09-18 03:20:38,978 - INFO - Model age: 0 days
+2025-09-18 03:20:38,979 - INFO - Model is 0 days old. No retraining needed.
+2025-09-18 03:20:39,010 - INFO - RMSE change: 0.0000, F1 change: 0.0000
+2025-09-18 03:20:39,011 - INFO - No significant model drift detected.
+2025-09-18 03:21:07,925 - INFO - Model age: 0 days
+2025-09-18 03:21:07,925 - INFO - Model is 0 days old. No retraining needed.
+2025-09-18 03:21:07,925 - INFO - RMSE change: 0.0000, F1 change: 0.0000
+2025-09-18 03:21:07,925 - INFO - No significant model drift detected.
+2025-09-18 03:21:27,585 - INFO - Starting model retraining...
+2025-09-18 03:21:27,585 - INFO - Performing full retraining...
+2025-09-18 03:21:37,923 - ERROR - Error during retraining: 'dict' object has no attribute 'get_params'
+2025-09-18 03:21:53,449 - INFO - Starting model retraining...
+2025-09-18 03:21:53,449 - INFO - Performing full retraining...
+2025-09-18 03:22:32,859 - INFO - Model retraining completed successfully!
+2025-09-18 03:22:32,860 - INFO - New performance - RMSE: 0.4324, F1: 0.3547
+2025-09-18 03:22:32,861 - INFO - Model age: 0 days
+2025-09-18 03:22:32,861 - INFO - Model is 0 days old. No retraining needed.
+2025-09-18 03:22:32,871 - INFO - RMSE change: -0.8638, F1 change: -0.0543
+2025-09-18 03:22:32,871 - INFO - No significant model drift detected.
+2025-09-18 03:22:59,262 - INFO - Model age: 0 days
+2025-09-18 03:22:59,262 - INFO - Model is 0 days old. No retraining needed.
+2025-09-18 03:22:59,263 - INFO - RMSE change: -0.8638, F1 change: -0.0543
+2025-09-18 03:22:59,263 - INFO - No significant model drift detected.

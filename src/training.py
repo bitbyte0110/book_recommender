@@ -39,8 +39,12 @@ class HybridRecommenderTrainer:
         """
         print("Loading and preprocessing data...")
         
+        # Prefer processed files if present
+        processed_books = os.path.join(self.data_dir, 'processed', 'books_clean.csv')
+        processed_ratings = os.path.join(self.data_dir, 'processed', 'ratings.csv')
+
         # Load books data
-        books_path = os.path.join(self.data_dir, 'raw', 'books.csv')
+        books_path = processed_books if os.path.exists(processed_books) else os.path.join(self.data_dir, 'raw', 'books.csv')
         if os.path.exists(books_path):
             # Use error_bad_lines=False to skip malformed lines and warn_bad_lines=True to show warnings
             try:
@@ -55,7 +59,7 @@ class HybridRecommenderTrainer:
             books_df = self._create_sample_books()
         
         # Load ratings data
-        ratings_path = os.path.join(self.data_dir, 'raw', 'Books_rating.csv')
+        ratings_path = processed_ratings if os.path.exists(processed_ratings) else os.path.join(self.data_dir, 'raw', 'Books_rating.csv')
         if os.path.exists(ratings_path):
             ratings_df = pd.read_csv(ratings_path)
             print(f"Loaded {len(ratings_df)} ratings")
@@ -259,9 +263,12 @@ class HybridRecommenderTrainer:
     
     def train_collaborative_model(self, ratings_df, **kwargs):
         """
-        Train collaborative filtering model using TruncatedSVD
+        Train collaborative filtering model using bias-adjusted ALS
         """
         print("Training collaborative filtering model...")
+        
+        # Import the improved collaborative filtering
+        from src.collaborative import create_item_item_similarity_matrix
         
         # Create user-item matrix
         user_item_matrix = ratings_df.pivot_table(
@@ -271,22 +278,16 @@ class HybridRecommenderTrainer:
             fill_value=0
         )
         
-        # SVD parameters - ensure n_components doesn't exceed matrix dimensions
-        n_components = min(kwargs.get('n_factors', 50), user_item_matrix.shape[1], user_item_matrix.shape[0])
+        # Use the improved ALS-based collaborative filtering
+        item_similarity_matrix = create_item_item_similarity_matrix(user_item_matrix)
         
-        # Create TruncatedSVD model
-        self.collab_model = TruncatedSVD(
-            n_components=n_components,
-            random_state=42
-        )
+        # Store the similarity matrix and user-item matrix
+        self.collab_model = {
+            'item_similarity_matrix': item_similarity_matrix,
+            'user_item_matrix': user_item_matrix
+        }
         
-        # Fit the model
-        self.collab_model.fit(user_item_matrix)
-        
-        # Store the user-item matrix for predictions
-        self.user_item_matrix = user_item_matrix
-        
-        print(f"Collaborative model trained with {n_components} components")
+        print(f"Collaborative model trained with bias-adjusted ALS")
         return self.collab_model
     
     def hyperparameter_tuning(self, ratings_df, books_df):
@@ -390,14 +391,20 @@ class HybridRecommenderTrainer:
         
         # Save collaborative model
         if self.collab_model is not None:
-            joblib.dump(self.collab_model, 
-                       os.path.join(self.models_dir, 'svd_model.pkl'))
+            if isinstance(self.collab_model, dict) and 'item_similarity_matrix' in self.collab_model:
+                # Save the new ALS-based model
+                joblib.dump(self.collab_model, 
+                           os.path.join(self.models_dir, 'enhanced_svd_model.pkl'))
+            else:
+                # Fallback for old SVD model
+                joblib.dump(self.collab_model, 
+                           os.path.join(self.models_dir, 'svd_model.pkl'))
         
         # Save training metadata
         metadata = {
             'training_date': datetime.now().isoformat(),
             'content_model_shape': self.content_similarity_matrix.shape if self.content_similarity_matrix is not None else None,
-            'collab_model_params': self.collab_model.get_params() if self.collab_model is not None else None
+            'collab_model_params': self.collab_model.get_params() if hasattr(self.collab_model, 'get_params') else 'ALS-based collaborative model'
         }
         
         joblib.dump(metadata, os.path.join(self.models_dir, 'training_metadata.pkl'))

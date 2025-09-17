@@ -20,6 +20,9 @@ sys.path.append('.')
 from src.training import HybridRecommenderTrainer
 from evaluation.metrics import RecommenderEvaluator
 
+# Ensure logs directory exists before configuring logging
+os.makedirs('logs', exist_ok=True)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -142,19 +145,22 @@ class ModelRetrainer:
         """
         try:
             evaluator = RecommenderEvaluator(self.data_dir, self.models_dir)
-            results = evaluator.run_full_evaluation(alpha_values=[0.6])  # Test with default alpha
-            
-            # Get metrics for alpha=0.6
-            metrics = results[0.6]
-            
+            comp = evaluator.compare_all_systems(
+                alpha_values=[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+                top_n=10,
+                threshold=3.0,
+                test_size=0.2
+            )
+
+            best = comp['hybrid_filtering']['best_alpha_results']
             return {
-                'rmse': metrics['rmse'],
-                'mae': metrics['mae'],
-                'precision': metrics['precision'],
-                'recall': metrics['recall'],
-                'f1': metrics['f1'],
-                'coverage': metrics['coverage'],
-                'diversity': metrics['diversity']
+                'rmse': best.get('rmse', 0.0),
+                'mae': 0.0,
+                'precision': best.get('precision', 0.0),
+                'recall': best.get('recall', 0.0),
+                'f1': best.get('f1', 0.0),
+                'coverage': best.get('coverage', 0.0),
+                'diversity': best.get('diversity', 0.0)
             }
             
         except Exception as e:
