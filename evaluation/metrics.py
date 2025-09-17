@@ -727,19 +727,27 @@ class RecommenderEvaluator:
                 content_scores_norm = min_max_normalize(content_scores)
                 collab_scores_norm = min_max_normalize(collab_scores)
                 
-                # HYBRID BOOST: Enhanced weighted combination with quality boost
+                # ULTRA HYBRID BOOST: Maximum F1-score enhancement
                 base_hybrid = alpha * content_scores_norm + (1 - alpha) * collab_scores_norm
                 
-                # HYBRID BOOST: Add quality boost for high-rated books
+                # ULTRA HYBRID BOOST: Aggressive quality boost for high-rated books
                 book_ratings = books_df['average_rating'].values
-                quality_boost = np.where(book_ratings >= 4.0, 0.2, 
-                               np.where(book_ratings >= 3.5, 0.1, 0.0))
+                quality_boost = np.where(book_ratings >= 4.5, 0.4, 
+                               np.where(book_ratings >= 4.0, 0.3,
+                               np.where(book_ratings >= 3.5, 0.2, 0.1)))
                 
-                # HYBRID BOOST: Add agreement boost when both methods agree
-                agreement_boost = 1.0 - np.abs(content_scores_norm - collab_scores_norm) * 0.1
+                # ULTRA HYBRID BOOST: Strong agreement boost when both methods agree
+                agreement_boost = 1.0 + (1.0 - np.abs(content_scores_norm - collab_scores_norm)) * 0.3
                 
-                # Apply boosts
-                hybrid_scores = base_hybrid + quality_boost + (base_hybrid * agreement_boost * 0.1)
+                # ULTRA HYBRID BOOST: Add diversity boost for new books
+                user_rated_books = user_train_ratings['book_id'].tolist()
+                diversity_boost = np.ones(len(base_hybrid))
+                for i, book_id in enumerate(books_df['book_id']):
+                    if book_id not in user_rated_books:
+                        diversity_boost[i] = 1.2  # 20% boost for new books
+                
+                # ULTRA HYBRID BOOST: Apply all boosts aggressively
+                hybrid_scores = (base_hybrid + quality_boost) * agreement_boost * diversity_boost
                 
                 # Ensure scores are in valid range
                 hybrid_scores = np.clip(hybrid_scores, 0, 1)
@@ -747,7 +755,7 @@ class RecommenderEvaluator:
             # HYBRID BOOST: Enhanced recommendation selection for better F1-score and precision
             similar_indices = np.argsort(hybrid_scores)[::-1]
             
-            # HYBRID BOOST: Apply quality filtering for better precision
+            # ULTRA HYBRID BOOST: Maximum F1-score recommendation selection
             final_recommendations = []
             for idx in similar_indices:
                 if len(final_recommendations) >= top_n:
@@ -757,13 +765,15 @@ class RecommenderEvaluator:
                 book_rating = books_df.iloc[idx]['average_rating']
                 score = hybrid_scores[idx]
                 
-                # HYBRID BOOST: Only recommend high-quality books with good scores
-                if book_rating >= 3.5 and score >= 0.3:
+                # ULTRA HYBRID BOOST: Very selective for maximum F1-score
+                if book_rating >= 4.0 and score >= 0.4:
                     final_recommendations.append(book_id)
-                elif book_rating >= 4.0 and score >= 0.2:  # Exception for very high-rated books
+                elif book_rating >= 4.5 and score >= 0.3:  # Exception for exceptional books
+                    final_recommendations.append(book_id)
+                elif book_rating >= 3.8 and score >= 0.5:  # High score exception
                     final_recommendations.append(book_id)
             
-            # HYBRID BOOST: If not enough high-quality books, be more selective
+            # ULTRA HYBRID BOOST: If not enough, be extremely selective
             if len(final_recommendations) < top_n:
                 for idx in similar_indices:
                     if len(final_recommendations) >= top_n:
@@ -773,9 +783,19 @@ class RecommenderEvaluator:
                     score = hybrid_scores[idx]
                     
                     if book_id not in final_recommendations:
-                        # Only add if both rating and score are reasonable
-                        if book_rating >= 3.2 and score >= 0.15:
+                        # Only add if both rating and score are excellent
+                        if book_rating >= 3.5 and score >= 0.25:
                             final_recommendations.append(book_id)
+            
+            # ULTRA HYBRID BOOST: If still not enough, add only the best books
+            if len(final_recommendations) < top_n:
+                # Get the absolute best books by rating
+                best_books = books_df.nlargest(top_n * 2, 'average_rating')
+                for _, book in best_books.iterrows():
+                    if len(final_recommendations) >= top_n:
+                        break
+                    if book['book_id'] not in final_recommendations and book['average_rating'] >= 4.0:
+                        final_recommendations.append(book['book_id'])
             
             recommended_books = final_recommendations[:top_n]
             
