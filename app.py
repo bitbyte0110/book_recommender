@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 import sys
+import altair as alt
 
 # Add src directory to path
 sys.path.append('src')
@@ -576,6 +577,52 @@ def main():
                     with tab2:
                         display_overlap_analysis(overlap_data)
                 
+                # Similarity distributions (Cosine vs Pearson)
+                with st.expander("📈 Similarity Distributions"):
+                    try:
+                        col_a, col_b = st.columns(2)
+
+                        # Cosine similarity distribution from collaborative matrix
+                        if collab_sim_matrix is not None and isinstance(collab_sim_matrix, np.ndarray):
+                            tri_upper_idx = np.triu_indices_from(collab_sim_matrix, k=1)
+                            cosine_values = collab_sim_matrix[tri_upper_idx].astype(float)
+                            cosine_df = pd.DataFrame({"score": cosine_values})
+                            cosine_chart = (
+                                alt.Chart(cosine_df)
+                                .mark_bar()
+                                .encode(
+                                    x=alt.X("score:Q", bin=alt.Bin(maxbins=30), title="Similarity Score"),
+                                    y=alt.Y("count()", title="count")
+                                )
+                                .properties(title="Distribution of Similarity Scores")
+                            )
+                            col_a.altair_chart(cosine_chart, use_container_width=True)
+
+                        # Pearson correlation distribution computed from ratings
+                        try:
+                            user_item_matrix = create_user_item_matrix(ratings_df, books_df)
+                            # Replace zeros (unrated) with NaN so Pearson uses only co-rated pairs
+                            ratings_for_corr = user_item_matrix.replace(0, np.nan)
+                            pearson_corr = ratings_for_corr.corr(method="pearson", min_periods=2)
+                            tri_upper_idx_p = np.triu_indices_from(pearson_corr.values, k=1)
+                            pearson_values = pearson_corr.values[tri_upper_idx_p]
+                            pearson_values = pearson_values[~np.isnan(pearson_values)]
+                            pearson_df = pd.DataFrame({"correlation": pearson_values.astype(float)})
+                            pearson_chart = (
+                                alt.Chart(pearson_df)
+                                .mark_bar()
+                                .encode(
+                                    x=alt.X("correlation:Q", bin=alt.Bin(maxbins=30), title="Pearson Correlation"),
+                                    y=alt.Y("count()", title="count")
+                                )
+                                .properties(title="Pearson Correlation Distribution")
+                            )
+                            col_b.altair_chart(pearson_chart, use_container_width=True)
+                        except Exception as e:
+                            st.info(f"Could not compute Pearson correlation distribution: {e}")
+                    except Exception as e:
+                        st.info(f"Could not render similarity distributions: {e}")
+
                 # Success message
                 st.success("✅ Recommendations generated successfully!")
                 
