@@ -1,0 +1,92 @@
+{
+  "evaluation_date": "2025-09-07T22:44:54.648473",
+  "systems_comparison": {
+    "collaborative_filtering": {
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "mse": 1.0,
+      "rmse": 1.0,
+      "n_users_evaluated": 0
+    },
+    "content_based_filtering": {
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "mse": 1.0,
+      "rmse": 1.0,
+      "n_users_evaluated": 0
+    },
+    "hybrid_filtering": {
+      "best_alpha": 0.0,
+      "best_alpha_results": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0,
+        "mse": 1.0,
+        "rmse": 1.0,
+        "n_users_evaluated": 0
+      },
+      "all_alpha_results": {
+        "0.0": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 0
+        },
+        "0.5": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 0
+        },
+        "1.0": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "mse": 1.0,
+          "rmse": 1.0,
+          "n_users_evaluated": 0
+        }
+      }
+    },
+    "evaluation_params": {
+      "top_n": 5,
+      "threshold": 3.0,
+      "test_size": 0.1,
+      "alpha_values": [
+        0.0,
+        0.5,
+        1.0
+      ]
+    }
+  },
+  "summary": {
+    "best_system_by_metric": {
+      "precision": {
+        "system": "collaborative",
+        "value": 0
+      },
+      "recall": {
+        "system": "collaborative",
+        "value": 0
+      },
+      "f1": {
+        "system": "collaborative",
+        "value": 0
+      },
+      "mse": {
+        "system": "collaborative",
+        "value": 1.0
+      },
+      "rmse": {
+        "system": "collaborative",
+        "value": 1.0
+      }
+    }
+  }
+}

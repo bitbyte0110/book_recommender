@@ -68,257 +68,12 @@ class RecommenderEvaluator:
         
         return books_df, ratings_df, content_sim_matrix, model
     
-    def enhance_collaborative_model(self, ratings_df, model):
-        """
-        Enhance collaborative filtering with advanced techniques for perfect metrics
-        """
-        print("Enhancing collaborative filtering model...")
-        
-        # Create user-item matrix
-        user_item_matrix = ratings_df.pivot_table(
-            index='user_id', 
-            columns='book_id', 
-            values='rating', 
-            fill_value=0
-        )
-        
-        # Advanced neural collaborative filtering
-        if not isinstance(model, dict) or 'neural_model' not in model:
-            # Create enhanced neural model
-            n_users, n_items = user_item_matrix.shape
-            
-            # Create user and item embeddings
-            user_embeddings = np.random.normal(0, 0.1, (n_users, 50))
-            item_embeddings = np.random.normal(0, 0.1, (n_items, 50))
-            
-            # Create training data
-            X_train = []
-            y_train = []
-            
-            for user_idx, user_id in enumerate(user_item_matrix.index):
-                for item_idx, item_id in enumerate(user_item_matrix.columns):
-                    rating = user_item_matrix.iloc[user_idx, item_idx]
-                    if rating > 0:
-                        # Combine user and item embeddings
-                        combined_features = np.concatenate([
-                            user_embeddings[user_idx],
-                            item_embeddings[item_idx],
-                            [user_idx / n_users, item_idx / n_items]  # Normalized indices
-                        ])
-                        X_train.append(combined_features)
-                        y_train.append(rating)
-            
-            X_train = np.array(X_train)
-            y_train = np.array(y_train)
-            
-            # Train advanced neural network
-            neural_model = MLPRegressor(
-                hidden_layer_sizes=(200, 100, 50),
-                activation='relu',
-                solver='adam',
-                alpha=0.001,
-                learning_rate='adaptive',
-                max_iter=1000,
-                random_state=42
-            )
-            
-            neural_model.fit(X_train, y_train)
-            
-            # Create enhanced model structure
-            enhanced_model = {
-                'neural_model': neural_model,
-                'user_embeddings': user_embeddings,
-                'item_embeddings': item_embeddings,
-                'user_item_matrix': user_item_matrix,
-                'user_bias': {},
-                'item_bias': {},
-                'global_bias': np.mean(y_train)
-            }
-            
-            # Calculate bias terms
-            for user_id in user_item_matrix.index:
-                user_ratings = user_item_matrix.loc[user_id]
-                user_ratings = user_ratings[user_ratings > 0]
-                if len(user_ratings) > 0:
-                    enhanced_model['user_bias'][user_id] = np.mean(user_ratings) - enhanced_model['global_bias']
-            
-            for item_id in user_item_matrix.columns:
-                item_ratings = user_item_matrix[item_id]
-                item_ratings = item_ratings[item_ratings > 0]
-                if len(item_ratings) > 0:
-                    enhanced_model['item_bias'][item_id] = np.mean(item_ratings) - enhanced_model['global_bias']
-            
-            return enhanced_model
-        
-        return model
     
-    def enhance_content_similarity(self, books_df, content_sim_matrix):
-        """
-        Enhance content-based similarity with advanced techniques
-        """
-        print("Enhancing content-based similarity matrix...")
-        
-        # Apply advanced enhancement to existing similarity matrix
-        enhanced_sim = content_sim_matrix.copy()
-        
-        # Apply exponential boosting for better similarity scores
-        enhanced_sim = np.power(enhanced_sim, 0.5)  # Boost similarities
-        
-        # Apply sigmoid transformation for better distribution
-        enhanced_sim = 1 / (1 + np.exp(-3 * (enhanced_sim - 0.3)))
-        
-        # Add noise reduction
-        enhanced_sim = np.maximum(enhanced_sim, 0.01)  # Ensure minimum similarity
-        
-        # Apply smoothing
-        from scipy.ndimage import gaussian_filter
-        enhanced_sim = gaussian_filter(enhanced_sim, sigma=0.5)
-        
-        return enhanced_sim
     
-    def create_ensemble_models(self, ratings_df, books_df):
-        """
-        Create ensemble of multiple models for perfect predictions
-        """
-        print("Creating ensemble models...")
-        
-        # Create user-item matrix
-        user_item_matrix = ratings_df.pivot_table(
-            index='user_id', 
-            columns='book_id', 
-            values='rating', 
-            fill_value=0
-        )
-        
-        ensemble_models = {}
-        
-        # Model 1: Advanced Neural Network
-        X_train, y_train = [], []
-        for user_idx, user_id in enumerate(user_item_matrix.index):
-            for item_idx, item_id in enumerate(user_item_matrix.columns):
-                rating = user_item_matrix.iloc[user_idx, item_idx]
-                if rating > 0:
-                    features = [
-                        user_idx / len(user_item_matrix.index),
-                        item_idx / len(user_item_matrix.columns),
-                        np.mean(user_item_matrix.iloc[user_idx, :]),
-                        np.mean(user_item_matrix.iloc[:, item_idx]),
-                        len(user_item_matrix.iloc[user_idx, :][user_item_matrix.iloc[user_idx, :] > 0]),
-                        len(user_item_matrix.iloc[:, item_idx][user_item_matrix.iloc[:, item_idx] > 0])
-                    ]
-                    X_train.append(features)
-                    y_train.append(rating)
-        
-        X_train = np.array(X_train)
-        y_train = np.array(y_train)
-        
-        # Neural Network
-        nn_model = MLPRegressor(
-            hidden_layer_sizes=(300, 150, 75),
-            activation='relu',
-            solver='adam',
-            alpha=0.0001,
-            learning_rate='adaptive',
-            max_iter=2000,
-            random_state=42
-        )
-        nn_model.fit(X_train, y_train)
-        ensemble_models['neural'] = nn_model
-        
-        # Random Forest
-        rf_model = RandomForestRegressor(
-            n_estimators=200,
-            max_depth=20,
-            min_samples_split=5,
-            min_samples_leaf=2,
-            random_state=42
-        )
-        rf_model.fit(X_train, y_train)
-        ensemble_models['random_forest'] = rf_model
-        
-        # Gradient Boosting
-        gb_model = GradientBoostingRegressor(
-            n_estimators=200,
-            learning_rate=0.1,
-            max_depth=10,
-            random_state=42
-        )
-        gb_model.fit(X_train, y_train)
-        ensemble_models['gradient_boosting'] = gb_model
-        
-        return ensemble_models, user_item_matrix
     
-    def optimize_hybrid_weights(self, ratings_df, content_sim_matrix, model, test_size=0.2):
-        """
-        Optimize hybrid weights using advanced optimization techniques
-        """
-        print("Optimizing hybrid weights...")
-        
-        # Return optimized weights for perfect performance
-        return {
-            'collaborative_weight': 0.4,
-            'content_weight': 0.4,
-            'ensemble_weight': 0.2
-        }
     
-    def _get_collaborative_prediction(self, user_id, model, train_ratings):
-        """Get collaborative filtering predictions for a user"""
-        # Simplified collaborative prediction
-        user_ratings = train_ratings[train_ratings['user_id'] == user_id]
-        if len(user_ratings) == 0:
-            return {}
-        
-        # Use user's average rating as baseline
-        avg_rating = user_ratings['rating'].mean()
-        predictions = {}
-        
-        # Get all books
-        all_books = train_ratings['book_id'].unique()
-        for book_id in all_books:
-            predictions[book_id] = avg_rating + np.random.normal(0, 0.1)
-        
-        return predictions
     
-    def _get_content_prediction(self, user_id, content_sim_matrix, train_ratings):
-        """Get content-based predictions for a user"""
-        user_ratings = train_ratings[train_ratings['user_id'] == user_id]
-        if len(user_ratings) == 0:
-            return {}
-        
-        # Get user's top-rated books
-        top_books = user_ratings.nlargest(3, 'rating')['book_id'].tolist()
-        
-        predictions = {}
-        all_books = train_ratings['book_id'].unique()
-        
-        for book_id in all_books:
-            similarity_score = 0
-            for top_book in top_books:
-                # Simplified similarity calculation
-                similarity_score += np.random.uniform(0.3, 0.9)
-            predictions[book_id] = similarity_score / len(top_books) * 5.0
-        
-        return predictions
     
-    def _get_ensemble_prediction(self, user_id, train_ratings):
-        """Get ensemble model predictions for a user"""
-        user_ratings = train_ratings[train_ratings['user_id'] == user_id]
-        if len(user_ratings) == 0:
-            return {}
-        
-        avg_rating = user_ratings['rating'].mean()
-        predictions = {}
-        
-        all_books = train_ratings['book_id'].unique()
-        for book_id in all_books:
-            # Enhanced prediction with multiple factors
-            base_pred = avg_rating
-            popularity_factor = np.random.uniform(0.8, 1.2)
-            quality_factor = np.random.uniform(0.9, 1.1)
-            
-            predictions[book_id] = base_pred * popularity_factor * quality_factor
-        
-        return predictions
     
     def _get_top_recommendations(self, predictions, top_n):
         """Get top N recommendations from predictions"""
@@ -327,18 +82,17 @@ class RecommenderEvaluator:
     
     def evaluate_collaborative_filtering(self, ratings_df, model, content_sim_matrix, top_n=10, threshold=3.0, test_size=0.2):
         """
-        Evaluate collaborative filtering system with proper, honest evaluation
+        Evaluate collaborative filtering system with proper methodology
         Returns: precision, recall, f1, mse, rmse
         """
         print("Evaluating Collaborative Filtering...")
         
-        # Split data for evaluation
-        np.random.seed(42)
-        ratings_shuffled = ratings_df.sample(frac=1, random_state=42)
-        split_idx = int(len(ratings_shuffled) * (1 - test_size))
+        # Use temporal split - more realistic for recommendation systems
+        ratings_sorted = ratings_df.sort_values('timestamp') if 'timestamp' in ratings_df.columns else ratings_df.sort_index()
+        split_idx = int(len(ratings_sorted) * (1 - test_size))
         
-        train_ratings = ratings_shuffled[:split_idx]
-        test_ratings = ratings_shuffled[split_idx:]
+        train_ratings = ratings_sorted[:split_idx]
+        test_ratings = ratings_sorted[split_idx:]
         
         if len(train_ratings) == 0 or len(test_ratings) == 0:
             return {'precision': 0, 'recall': 0, 'f1': 0, 'mse': 1.0, 'rmse': 1.0}
@@ -355,8 +109,10 @@ class RecommenderEvaluator:
         if hasattr(model, 'fit'):
             model.fit(train_matrix)
         
-        # Get unique users for evaluation
-        users = test_ratings['user_id'].unique()
+        # Get users who have ratings in both train and test sets
+        train_users = set(train_ratings['user_id'].unique())
+        test_users = set(test_ratings['user_id'].unique())
+        eval_users = list(train_users.intersection(test_users))
         
         precision_scores = []
         recall_scores = []
@@ -364,98 +120,89 @@ class RecommenderEvaluator:
         mse_scores = []
         rmse_scores = []
         
-        for user_id in users[:200]:  # Sample for efficiency
+        for user_id in eval_users[:100]:  # Limit for efficiency
             user_test_ratings = test_ratings[test_ratings['user_id'] == user_id]
             if len(user_test_ratings) == 0:
                 continue
             
-            # Get collaborative recommendations using ONLY training data
-            if user_id in train_matrix.index:
-                user_idx = train_matrix.index.get_loc(user_id)
-                
-                # Make predictions for all books using ONLY training data
-                predictions = []
-                book_ids = []
-                
-                for book_id in train_matrix.columns:
+            # Get user's training history
+            user_train_ratings = train_ratings[train_ratings['user_id'] == user_id]
+            if len(user_train_ratings) < 2:  # Reduced minimum history for small dataset
+                continue
+            
+            # Make predictions for books user hasn't rated in training
+            user_rated_books = set(user_train_ratings['book_id'])
+            all_books = set(train_matrix.columns)
+            unrated_books = list(all_books - user_rated_books)
+            
+            # For small datasets, allow recommendations even if fewer than top_n
+            if len(unrated_books) == 0:
+                continue
+            
+            predictions = []
+            book_ids = []
+            
+            for book_id in unrated_books:
+                if book_id in train_matrix.columns:
                     book_idx = train_matrix.columns.get_loc(book_id)
+                    user_idx = train_matrix.index.get_loc(user_id)
                     
-                    if isinstance(model, dict) and 'neural_model' in model and model['neural_model'] is not None:
-                        # Neural collaborative filtering
-                        user_factor = model['user_factors'][user_idx]
-                        item_factor = model['item_factors'][book_idx]
-                        user_bias = model['user_bias'].get(user_id, 0)
-                        item_bias = model['item_bias'].get(book_id, 0)
-                        
-                        combined_features = np.concatenate([
-                            user_factor, item_factor, [user_bias, item_bias, model['global_bias']]
-                        ]).reshape(1, -1)
-                        
-                        pred = model['neural_model'].predict(combined_features)[0]
-                    elif isinstance(model, dict) and 'svd' in model:
-                        # Enhanced SVD model
-                        user_vector = train_matrix.iloc[user_idx].values.reshape(1, -1)
-                        user_factors = model['svd'].transform(user_vector)
-                        reconstructed = model['svd'].inverse_transform(user_factors)
-                        base_pred = reconstructed[0, book_idx]
-                        
-                        user_bias = model['user_bias'].get(user_id, 0)
-                        item_bias = model['item_bias'].get(book_id, 0)
-                        pred = base_pred + user_bias + item_bias + model['global_bias']
-                    elif hasattr(model, 'user_factors'):
+                    # Make prediction based on model type
+                    if hasattr(model, 'user_factors') and hasattr(model, 'item_factors'):
                         # ALS model
                         pred = model.user_factors[user_idx] @ model.item_factors[book_idx]
                     elif hasattr(model, 'transform'):
-                        # Standard SVD model
+                        # SVD model
                         user_vector = train_matrix.iloc[user_idx].values.reshape(1, -1)
                         user_factors = model.transform(user_vector)
                         reconstructed = model.inverse_transform(user_factors)
                         pred = reconstructed[0, book_idx]
                     else:
-                        # Fallback to global average
-                        pred = train_ratings['rating'].mean()
+                        # Fallback to user's average rating
+                        pred = user_train_ratings['rating'].mean()
                     
                     pred = max(1.0, min(5.0, pred))
                     predictions.append(pred)
                     book_ids.append(book_id)
+            
+            if len(predictions) == 0:
+                continue
+            
+            # Get top-N recommendations (or all available if fewer)
+            pred_scores = list(zip(book_ids, predictions))
+            pred_scores.sort(key=lambda x: x[1], reverse=True)
+            recommended_books = [book_id for book_id, _ in pred_scores[:min(top_n, len(pred_scores))]]
+            
+            # Get actual high-rated books from test set
+            actual_high_rated = user_test_ratings[user_test_ratings['rating'] >= threshold]['book_id'].tolist()
+            
+            if len(actual_high_rated) > 0:
+                # Calculate precision and recall properly
+                true_positives = len(set(recommended_books).intersection(set(actual_high_rated)))
+                precision = true_positives / len(recommended_books) if len(recommended_books) > 0 else 0
+                recall = true_positives / len(actual_high_rated) if len(actual_high_rated) > 0 else 0
+                f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
                 
-                # Get top-N recommendations based on predictions only
-                pred_scores = list(zip(book_ids, predictions))
-                pred_scores.sort(key=lambda x: x[1], reverse=True)
-                recommended_books = [book_id for book_id, _ in pred_scores[:top_n]]
+                precision_scores.append(precision)
+                recall_scores.append(recall)
+                f1_scores.append(f1)
+            
+            # Calculate MSE and RMSE for test ratings
+            user_mse_scores = []
+            for _, row in user_test_ratings.iterrows():
+                book_id = row['book_id']
+                actual_rating = row['rating']
                 
-                # Calculate metrics using test data
-                actual_high_rated = user_test_ratings[user_test_ratings['rating'] >= threshold]['book_id'].tolist()
-                
-                if len(actual_high_rated) > 0:
-                    y_true = [1 if book_id in actual_high_rated else 0 for book_id in recommended_books]
-                    y_pred = [1] * len(recommended_books)
-                    
-                    if sum(y_true) > 0:
-                        precision = precision_score(y_true, y_pred, zero_division=0)
-                        recall = recall_score(y_true, y_pred, zero_division=0)
-                        f1 = f1_score(y_true, y_pred, zero_division=0)
-                        
-                        precision_scores.append(precision)
-                        recall_scores.append(recall)
-                        f1_scores.append(f1)
-                
-                # Calculate MSE and RMSE for this user
-                user_mse_scores = []
-                for _, row in user_test_ratings.iterrows():
-                    book_id = row['book_id']
-                    actual_rating = row['rating']
-                    
-                    if book_id in book_ids:
-                        book_idx = book_ids.index(book_id)
-                        pred_rating = predictions[book_idx]
-                        user_mse_scores.append((actual_rating - pred_rating) ** 2)
-                
-                if user_mse_scores:
-                    user_mse = np.mean(user_mse_scores)
-                    user_rmse = np.sqrt(user_mse)
-                    mse_scores.append(user_mse)
-                    rmse_scores.append(user_rmse)
+                if book_id in book_ids:
+                    book_idx = book_ids.index(book_id)
+                    pred_rating = predictions[book_idx]
+                    user_mse_scores.append((actual_rating - pred_rating) ** 2)
+            
+            if user_mse_scores:
+                user_mse = np.mean(user_mse_scores)
+                user_rmse = np.sqrt(user_mse)
+                mse_scores.append(user_mse)
+                rmse_scores.append(user_rmse)
         
         # Calculate coverage and diversity for collaborative filtering
         coverage_result = self.calculate_coverage(ratings_df, content_sim_matrix, top_n, n_users=100)
@@ -474,23 +221,27 @@ class RecommenderEvaluator:
     
     def evaluate_content_based_filtering(self, ratings_df, content_sim_matrix, top_n=10, threshold=3.0, test_size=0.2):
         """
-        Evaluate content-based filtering system with proper, honest evaluation
+        Evaluate content-based filtering system with proper methodology
         Returns: precision, recall, f1, mse, rmse
         """
         print("Evaluating Content-Based Filtering...")
         
-        # Split data for evaluation
-        np.random.seed(42)
-        ratings_shuffled = ratings_df.sample(frac=1, random_state=42)
-        split_idx = int(len(ratings_shuffled) * (1 - test_size))
+        # Use temporal split
+        ratings_sorted = ratings_df.sort_values('timestamp') if 'timestamp' in ratings_df.columns else ratings_df.sort_index()
+        split_idx = int(len(ratings_sorted) * (1 - test_size))
         
-        train_ratings = ratings_shuffled[:split_idx]
-        test_ratings = ratings_shuffled[split_idx:]
+        train_ratings = ratings_sorted[:split_idx]
+        test_ratings = ratings_sorted[split_idx:]
         
         if len(train_ratings) == 0 or len(test_ratings) == 0:
             return {'precision': 0, 'recall': 0, 'f1': 0, 'mse': 1.0, 'rmse': 1.0}
         
         books_df = pd.read_csv(os.path.join(self.data_dir, 'processed', 'books_clean.csv'))
+        
+        # Get users who have ratings in both train and test sets
+        train_users = set(train_ratings['user_id'].unique())
+        test_users = set(test_ratings['user_id'].unique())
+        eval_users = list(train_users.intersection(test_users))
         
         precision_scores = []
         recall_scores = []
@@ -498,17 +249,14 @@ class RecommenderEvaluator:
         mse_scores = []
         rmse_scores = []
         
-        # Get unique users for evaluation
-        users = test_ratings['user_id'].unique()
-        
-        for user_id in users[:200]:  # Sample for efficiency
+        for user_id in eval_users[:100]:  # Limit for efficiency
             user_test_ratings = test_ratings[test_ratings['user_id'] == user_id]
             if len(user_test_ratings) == 0:
                 continue
             
             # Get user's training ratings
             user_train_ratings = train_ratings[train_ratings['user_id'] == user_id]
-            if len(user_train_ratings) == 0:
+            if len(user_train_ratings) < 2:  # Reduced minimum history for small dataset
                 continue
             
             # Get user's top-rated books from training
@@ -528,25 +276,36 @@ class RecommenderEvaluator:
             if len(top_rated_books) > 0:
                 aggregated_scores = aggregated_scores / len(top_rated_books)
             
-            # Get top recommendations based on similarity scores only
-            similar_indices = np.argsort(aggregated_scores)[::-1][:top_n]
-            recommended_books = books_df.iloc[similar_indices]['book_id'].tolist()
+            # Get user's rated books to exclude from recommendations
+            user_rated_books = set(user_train_ratings['book_id'])
+            
+            # Get top recommendations, excluding already rated books
+            similar_indices = np.argsort(aggregated_scores)[::-1]
+            recommended_books = []
+            for idx in similar_indices:
+                book_id = books_df.iloc[idx]['book_id']
+                if book_id not in user_rated_books:
+                    recommended_books.append(book_id)
+                    if len(recommended_books) >= top_n:
+                        break
+            
+            # For small datasets, allow recommendations even if fewer than top_n
+            if len(recommended_books) == 0:
+                continue
             
             # Calculate metrics using test data
             actual_high_rated = user_test_ratings[user_test_ratings['rating'] >= threshold]['book_id'].tolist()
             
             if len(actual_high_rated) > 0:
-                y_true = [1 if book_id in actual_high_rated else 0 for book_id in recommended_books]
-                y_pred = [1] * len(recommended_books)
+                # Calculate precision and recall properly
+                true_positives = len(set(recommended_books).intersection(set(actual_high_rated)))
+                precision = true_positives / len(recommended_books) if len(recommended_books) > 0 else 0
+                recall = true_positives / len(actual_high_rated) if len(actual_high_rated) > 0 else 0
+                f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
                 
-                if sum(y_true) > 0:
-                    precision = precision_score(y_true, y_pred, zero_division=0)
-                    recall = recall_score(y_true, y_pred, zero_division=0)
-                    f1 = f1_score(y_true, y_pred, zero_division=0)
-                    
-                    precision_scores.append(precision)
-                    recall_scores.append(recall)
-                    f1_scores.append(f1)
+                precision_scores.append(precision)
+                recall_scores.append(recall)
+                f1_scores.append(f1)
             
             # Calculate MSE and RMSE (using similarity scores as predictions)
             user_mse_scores = []
@@ -583,18 +342,17 @@ class RecommenderEvaluator:
     
     def evaluate_hybrid_filtering(self, ratings_df, content_sim_matrix, model, alpha=0.5, top_n=10, threshold=3.0, test_size=0.2):
         """
-        Evaluate hybrid filtering system with proper, honest evaluation
+        Evaluate hybrid filtering system with proper methodology
         Returns: precision, recall, f1, mse, rmse
         """
         print(f"Evaluating Hybrid Filtering (alpha={alpha:.1f})...")
         
-        # Split data for evaluation
-        np.random.seed(42)
-        ratings_shuffled = ratings_df.sample(frac=1, random_state=42)
-        split_idx = int(len(ratings_shuffled) * (1 - test_size))
+        # Use temporal split
+        ratings_sorted = ratings_df.sort_values('timestamp') if 'timestamp' in ratings_df.columns else ratings_df.sort_index()
+        split_idx = int(len(ratings_sorted) * (1 - test_size))
         
-        train_ratings = ratings_shuffled[:split_idx]
-        test_ratings = ratings_shuffled[split_idx:]
+        train_ratings = ratings_sorted[:split_idx]
+        test_ratings = ratings_sorted[split_idx:]
         
         if len(train_ratings) == 0 or len(test_ratings) == 0:
             return {'precision': 0, 'recall': 0, 'f1': 0, 'mse': 1.0, 'rmse': 1.0}
@@ -613,24 +371,29 @@ class RecommenderEvaluator:
         if hasattr(model, 'fit'):
             model.fit(train_matrix)
         
+        # Get users who have ratings in both train and test sets
+        train_users = set(train_ratings['user_id'].unique())
+        test_users = set(test_ratings['user_id'].unique())
+        eval_users = list(train_users.intersection(test_users))
+        
         precision_scores = []
         recall_scores = []
         f1_scores = []
         mse_scores = []
         rmse_scores = []
         
-        # Get unique users for evaluation
-        users = test_ratings['user_id'].unique()
-        
-        for user_id in users[:200]:  # Sample for efficiency
+        for user_id in eval_users[:100]:  # Limit for efficiency
             user_test_ratings = test_ratings[test_ratings['user_id'] == user_id]
             if len(user_test_ratings) == 0:
                 continue
             
             # Get user's training ratings
             user_train_ratings = train_ratings[train_ratings['user_id'] == user_id]
-            if len(user_train_ratings) == 0:
+            if len(user_train_ratings) < 2:  # Reduced minimum history for small dataset
                 continue
+            
+            # Get user's rated books to exclude from recommendations
+            user_rated_books = set(user_train_ratings['book_id'])
             
             # Get content-based scores using ONLY training data
             top_rated_books = user_train_ratings.nlargest(3, 'rating')['book_id'].tolist()
@@ -656,35 +419,19 @@ class RecommenderEvaluator:
                     if book_id in train_matrix.columns:
                         book_idx = train_matrix.columns.get_loc(book_id)
                         
-                        if isinstance(model, dict) and 'neural_model' in model and model['neural_model'] is not None:
-                            user_factor = model['user_factors'][user_idx]
-                            item_factor = model['item_factors'][book_idx]
-                            user_bias = model['user_bias'].get(user_id, 0)
-                            item_bias = model['item_bias'].get(book_id, 0)
-                            
-                            combined_features = np.concatenate([
-                                user_factor, item_factor, [user_bias, item_bias, model['global_bias']]
-                            ]).reshape(1, -1)
-                            
-                            pred = model['neural_model'].predict(combined_features)[0]
-                        elif isinstance(model, dict) and 'svd' in model:
-                            user_vector = train_matrix.iloc[user_idx].values.reshape(1, -1)
-                            user_factors = model['svd'].transform(user_vector)
-                            reconstructed = model['svd'].inverse_transform(user_factors)
-                            base_pred = reconstructed[0, book_idx]
-                            
-                            user_bias = model['user_bias'].get(user_id, 0)
-                            item_bias = model['item_bias'].get(book_id, 0)
-                            pred = base_pred + user_bias + item_bias + model['global_bias']
-                        elif hasattr(model, 'user_factors'):
+                        # Make prediction based on model type
+                        if hasattr(model, 'user_factors') and hasattr(model, 'item_factors'):
+                            # ALS model
                             pred = model.user_factors[user_idx] @ model.item_factors[book_idx]
                         elif hasattr(model, 'transform'):
+                            # SVD model
                             user_vector = train_matrix.iloc[user_idx].values.reshape(1, -1)
                             user_factors = model.transform(user_vector)
                             reconstructed = model.inverse_transform(user_factors)
                             pred = reconstructed[0, book_idx]
                         else:
-                            pred = train_ratings['rating'].mean()
+                            # Fallback to user's average rating
+                            pred = user_train_ratings['rating'].mean()
                         
                         pred = max(1.0, min(5.0, pred))
                         collab_scores[i] = pred / 5.0  # Normalize to 0-1
@@ -692,25 +439,33 @@ class RecommenderEvaluator:
             # Combine scores with alpha weight
             hybrid_scores = alpha * collab_scores + (1 - alpha) * content_scores
             
-            # Get top recommendations based on hybrid scores only
-            similar_indices = np.argsort(hybrid_scores)[::-1][:top_n]
-            recommended_books = books_df.iloc[similar_indices]['book_id'].tolist()
+            # Get top recommendations, excluding already rated books
+            similar_indices = np.argsort(hybrid_scores)[::-1]
+            recommended_books = []
+            for idx in similar_indices:
+                book_id = books_df.iloc[idx]['book_id']
+                if book_id not in user_rated_books:
+                    recommended_books.append(book_id)
+                    if len(recommended_books) >= top_n:
+                        break
+            
+            # For small datasets, allow recommendations even if fewer than top_n
+            if len(recommended_books) == 0:
+                continue
             
             # Calculate metrics using test data
             actual_high_rated = user_test_ratings[user_test_ratings['rating'] >= threshold]['book_id'].tolist()
             
             if len(actual_high_rated) > 0:
-                y_true = [1 if book_id in actual_high_rated else 0 for book_id in recommended_books]
-                y_pred = [1] * len(recommended_books)
+                # Calculate precision and recall properly
+                true_positives = len(set(recommended_books).intersection(set(actual_high_rated)))
+                precision = true_positives / len(recommended_books) if len(recommended_books) > 0 else 0
+                recall = true_positives / len(actual_high_rated) if len(actual_high_rated) > 0 else 0
+                f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
                 
-                if sum(y_true) > 0:
-                    precision = precision_score(y_true, y_pred, zero_division=0)
-                    recall = recall_score(y_true, y_pred, zero_division=0)
-                    f1 = f1_score(y_true, y_pred, zero_division=0)
-                    
-                    precision_scores.append(precision)
-                    recall_scores.append(recall)
-                    f1_scores.append(f1)
+                precision_scores.append(precision)
+                recall_scores.append(recall)
+                f1_scores.append(f1)
             
             # Calculate MSE and RMSE
             user_mse_scores = []
@@ -1263,6 +1018,13 @@ class RecommenderEvaluator:
         # Load data and models
         books_df, ratings_df, content_sim_matrix, model = self.load_data_and_models()
         
+        # Calculate coverage and diversity (shared across all systems)
+        print("\n" + "="*60)
+        print("CALCULATING COVERAGE AND DIVERSITY")
+        print("="*60)
+        coverage_result = self.calculate_coverage(ratings_df, content_sim_matrix, top_n)
+        diversity_result = self.calculate_diversity(ratings_df, content_sim_matrix, top_n)
+        
         # Evaluate each system separately
         print("\n" + "="*60)
         print("EVALUATING COLLABORATIVE FILTERING")
@@ -1284,6 +1046,17 @@ class RecommenderEvaluator:
         # Find best hybrid alpha
         best_alpha = max(hybrid_results.keys(), key=lambda x: hybrid_results[x]['f1'])
         best_hybrid = hybrid_results[best_alpha]
+        
+        # Add coverage and diversity to all results
+        collab_results.update(coverage_result)
+        collab_results.update(diversity_result)
+        content_results.update(coverage_result)
+        content_results.update(diversity_result)
+        
+        # Add coverage and diversity to hybrid results
+        for alpha in hybrid_results:
+            hybrid_results[alpha].update(coverage_result)
+            hybrid_results[alpha].update(diversity_result)
         
         # Compile comprehensive results
         comparison_results = {
@@ -1438,9 +1211,9 @@ def main():
     # Run comprehensive system comparison
     results = evaluator.compare_all_systems(
         alpha_values=[0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-        top_n=10,
+        top_n=5,  # Reduced for small dataset
         threshold=3.0,
-        test_size=0.2
+        test_size=0.1  # Reduced test size to get more users
     )
     
     print(f"\nComprehensive evaluation completed!")
